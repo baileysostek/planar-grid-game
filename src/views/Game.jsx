@@ -7,6 +7,7 @@ import Board from '../components/Board';
 
 import { useGameStore } from '../store/GameStore'
 import { useThemeStore } from '../store/ThemeStore'
+import Controls from '../components/Controls';
 
 // Create a function to render our board.
 const Game = (props) => {
@@ -22,6 +23,7 @@ const Game = (props) => {
   return (
     <ThemeProvider theme={theme}>
       <Board/>
+      <Controls/>
     </ThemeProvider>
   );
 }

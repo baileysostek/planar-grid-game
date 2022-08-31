@@ -7,9 +7,6 @@ import Box from '@mui/material/Box';
 
 import Cell from './Cell';
 
-const width = 8;
-const height = 5;
-
 // Create a React Function component that takes in input props and renders some dom content.
 const Board = (props) => {
 
@@ -17,17 +14,30 @@ const Board = (props) => {
   const [change, setChange] = useState(true);     
 
   // Get everything out of our global stores that we may need
-  const increasePopulation = useGameStore((state) => state.increasePopulation);
+  const setDragging = useGameStore((state) => state.setDragging);
+  const dragging    = useGameStore((state) => state.dragging);
 
-  function renderCanvas(){
+  const grid    = useGameStore((state) => state.grid);
 
-  }
+  const width       = useGameStore((state) => state.width);
+  const height      = useGameStore((state) => state.height);
 
   return (
-    <div>
-      {[...Array(height)].map((item, index) => (
+    // This is the Parent DIV which represents a Board, it contains rows of cells
+    <div
+      style={{
+        borderRadius: '24px',
+        // backgroundColor: '#FF0000'
+        border:'8px solid',
+        padding: '24px'
+      }}
+      onMouseLeave={(event) => {
+        setDragging(false);
+      }}
+    >
+      {[...Array(height)].map((item, index_row) => (
         <Box
-          key={index}
+          key={index_row}
           sx={{
             display: 'flex',
             '& > :not(style)': {
@@ -35,8 +45,8 @@ const Board = (props) => {
             },
           }}
         >
-          {[...Array(width)].map((item, index) => (
-            <Cell key={index} />
+          {[...Array(width)].map((item, index_col) => (
+            <Cell key={index_col} x={index_col} y={index_row}/>
           ))}
         </Box>
       ))}
