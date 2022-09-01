@@ -23,7 +23,7 @@ const Board = (props) => {
   const width       = useGameStore((state) => state.width);
   const height      = useGameStore((state) => state.height);
 
-  markCellAsSource(0, 0, "#FF0000");
+  // markCellAsSource(0, 0, "#FF0000");
 
   return (
     // This is the Parent DIV which represents a Board, it contains rows of cells

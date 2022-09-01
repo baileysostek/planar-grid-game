@@ -112,7 +112,7 @@ const Cell = (props) => {
             if(!dragging){
               setHover(true);
             }else{
-              populate(x, y, colors[0]);
+              populate(x, y, colors[Math.floor(Math.random() * colors.length)]);
             }
           }}
 
@@ -123,7 +123,7 @@ const Cell = (props) => {
           onMouseDown={(event) => {
             event.preventDefault();
             setDragging(true); //TODO this should be the tile we are dragging.
-            populate(x, y, colors[0]);
+            populate(x, y, colors[Math.floor(Math.random() * colors.length)]);
           }}
 
           onMouseUp={(event) => {
@@ -140,7 +140,7 @@ const Cell = (props) => {
             transform: 'translate(-50%, -50%)',
 
             backgroundColor: color,
-            color:'',
+            color:'rgba(0, 0, 0, 0.87)',
 
             // Control if a border is shown or not.
             borderTop     : shouldConnectToNeighbor(up) ? 0 : 8,
@@ -173,7 +173,7 @@ const Cell = (props) => {
           {/* Bottom Left */}
           { (shouldConnectToNeighbor(down) && shouldConnectToNeighbor(left)) ? 
             <div style={{
-              backgroundColor: 'black',
+              backgroundColor: 'rgba(0, 0, 0, 0.87)',
               width: '0px',
               height: '0px',
               position: 'absolute',
@@ -190,7 +190,7 @@ const Cell = (props) => {
           {/* Bottom right */}
           { (shouldConnectToNeighbor(down) && shouldConnectToNeighbor(right)) ? 
             <div style={{
-              backgroundColor: 'black',
+              backgroundColor: 'rgba(0, 0, 0, 0.87)',
               width: '0px',
               height: '0px',
               position: 'absolute',
@@ -207,7 +207,7 @@ const Cell = (props) => {
           {/* Top Left */}
           { (shouldConnectToNeighbor(up) && shouldConnectToNeighbor(left)) ? 
             <div style={{
-              backgroundColor: 'black',
+              backgroundColor: 'rgba(0, 0, 0, 0.87)',
               width: '0px',
               height: '0px',
               position: 'absolute',
@@ -224,7 +224,7 @@ const Cell = (props) => {
           {/* Top right */}
           { (shouldConnectToNeighbor(up) && shouldConnectToNeighbor(right)) ? 
             <div style={{
-              backgroundColor: 'black',
+              backgroundColor: 'rgba(0, 0, 0, 0.87)',
               width: '0px',
               height: '0px',
               position: 'absolute',
