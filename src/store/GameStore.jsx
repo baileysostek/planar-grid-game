@@ -16,6 +16,9 @@ export const useGameStore = create((set) => ({
   width:8,
   height:5,
 
+  // Cache of colors
+  colors:{},
+
   // Setters for width and height also resize the grid.
   grid:[],
 
@@ -31,7 +34,22 @@ export const useGameStore = create((set) => ({
   // This function populates a cell with a color
   populate: (x, y, color) => set((state) => {
     const grid = [...state.grid];
-    grid[x + (y * state.width)] = {color:color};
+
+    // Make sure that the grid cell that we are editing is empty
+    if(grid[x + (y * state.width)]?.color){
+      if(!(grid[x + (y * state.width)]?.color == DEFAULT_COLOR)){
+        return {grid};// Return the same state if we cant edit this object.
+      }
+    }
+
+    // Now we will update the color index;
+    if(!state.colors[color]){
+      state.colors[color] = 0;
+    }
+    state.colors[color] += 1;
+
+    grid[x + (y * state.width)] = {color:color, value:state.colors[color]};
+
     return {grid}
   }), 
 
@@ -56,10 +74,23 @@ export const useGameStore = create((set) => ({
   // Here we will define global actions that users can perform
   reset: () => set((state) => ({
     dragging: null,
-    grid: new Array(state.width * state.height).fill(new_Cell())
+    grid: new Array(state.width * state.height).fill(new_Cell()),
+    colors:{}
   })),
 
   // This is a store function to load a level from disk. Levels are stored in the JSON format.
+
+  // This function sets an object to be a source tile of a color. 
+  markCellAsSource: (x, y, color) => set((state) => {
+    const grid = [...state.grid];
+
+    // Make sure that the grid cell that we are editing is empty
+    if(grid[x + (y * state.width)]){
+      grid[x + (y * state.width)].soruce = color
+    }
+
+    return {grid}
+  }), 
 
 }));  
 

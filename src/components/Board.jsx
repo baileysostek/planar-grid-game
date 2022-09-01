@@ -18,9 +18,12 @@ const Board = (props) => {
   const dragging    = useGameStore((state) => state.dragging);
 
   const grid    = useGameStore((state) => state.grid);
+  const markCellAsSource    = useGameStore((state) => state.markCellAsSource);
 
   const width       = useGameStore((state) => state.width);
   const height      = useGameStore((state) => state.height);
+
+  markCellAsSource(0, 0, "#FF0000");
 
   return (
     // This is the Parent DIV which represents a Board, it contains rows of cells
@@ -31,7 +34,7 @@ const Board = (props) => {
         border:'8px solid',
         padding: '24px'
       }}
-      onMouseLeave={(event) => {
+      onMouseLeave={(event) => { 
         setDragging(false);
       }}
     >

@@ -34,6 +34,18 @@ const Cell = (props) => {
     color = DEFAULT_COLOR;
   }
 
+  // This is the numeric value of this cell
+  let value = cell?.value;
+  if(!value){
+    value = 0;
+  }
+
+  // This is the representation of if this is a source or destination Cell, or just a regular cell.
+  let source = cell?.source;
+  if(!source){
+    source = false;
+  }
+
   // Here we get this cells neighbors
   let up    = getCell(x, y - 1);
   let down  = getCell(x, y + 1);
@@ -45,6 +57,8 @@ const Cell = (props) => {
   const yellow  = useColorStore((state) => state.yellow);
   const green   = useColorStore((state) => state.green);
   const blue    = useColorStore((state) => state.blue);
+
+  let colors = [red, orange, yellow, green, blue];
 
   // Internal State
   const [hover, setHover] = useState(false);
@@ -61,12 +75,19 @@ const Cell = (props) => {
       }
 
       // if the neighbor color is the same as our color, return true
-      if(neighbor?.color == color){
+      if ( neighbor?.color == color ) {
         // TODO add check that numeric value is increased by 1.
-        return true;
+        if( Math.abs((value - neighbor?.value)) <= 1 ){
+          return true;
+        }
       }
     }
     return false;
+  }
+
+  // This functionality handles a click/select event for a cell
+  const onSelect = () => {
+
   }
 
   return (
@@ -86,13 +107,12 @@ const Cell = (props) => {
         }}
       >
         <Paper 
-          elevation={!hover ? 12 : 0} 
           
           onMouseOver={() => {
             if(!dragging){
               setHover(true);
             }else{
-              populate(x, y, green);
+              populate(x, y, colors[0]);
             }
           }}
 
@@ -103,7 +123,7 @@ const Cell = (props) => {
           onMouseDown={(event) => {
             event.preventDefault();
             setDragging(true); //TODO this should be the tile we are dragging.
-            populate(x, y, orange);
+            populate(x, y, colors[0]);
           }}
 
           onMouseUp={(event) => {
@@ -134,15 +154,91 @@ const Cell = (props) => {
             paddingLeft    : shouldConnectToNeighbor(left) ? '8px' : '0px',
             paddingRight   : shouldConnectToNeighbor(right) ? '8px' : '0px',
 
-             // Control the rounding level on the corners of the cell.
-             borderTopLeftRadius : (shouldConnectToNeighbor(up) || shouldConnectToNeighbor(left)) ? '0px' : '24px',
-             borderTopRightRadius : (shouldConnectToNeighbor(up) || shouldConnectToNeighbor(right)) ? '0px' : '24px',
-             borderBottomLeftRadius : (shouldConnectToNeighbor(down) || shouldConnectToNeighbor(left)) ? '0px' : '24px',
-             borderBottomRightRadius : (shouldConnectToNeighbor(down) || shouldConnectToNeighbor(right)) ? '0px' : '24px',
+            // Control the rounding level on the corners of the cell.
+            borderTopLeftRadius : (shouldConnectToNeighbor(up) || shouldConnectToNeighbor(left)) ? '0px' : '24px',
+            borderTopRightRadius : (shouldConnectToNeighbor(up) || shouldConnectToNeighbor(right)) ? '0px' : '24px',
+            borderBottomLeftRadius : (shouldConnectToNeighbor(down) || shouldConnectToNeighbor(left)) ? '0px' : '24px',
+            borderBottomRightRadius : (shouldConnectToNeighbor(down) || shouldConnectToNeighbor(right)) ? '0px' : '24px',
+
+            //Control the Drop shadow around each of our cells
+
           }}
         >
-          {`${x}, ${y}`}
+          {/* Debug the values in the cell */}
+          {/* {`${x}, ${y}, ${value}`} */}
+
+          {source ? "S" : <div></div>}
+
+          {/* Control Corners between cells */}
+          {/* Bottom Left */}
+          { (shouldConnectToNeighbor(down) && shouldConnectToNeighbor(left)) ? 
+            <div style={{
+              backgroundColor: 'black',
+              width: '0px',
+              height: '0px',
+              position: 'absolute',
+              top: '128px',
+              left: '0px',
+              border: '8px solid',
+              borderTopRightRadius: '8px',
+              borderBottomWidth: '0px',
+              borderLeftWidth: '0px'
+            }}/>
+            : <div/>
+          }
+
+          {/* Bottom right */}
+          { (shouldConnectToNeighbor(down) && shouldConnectToNeighbor(right)) ? 
+            <div style={{
+              backgroundColor: 'black',
+              width: '0px',
+              height: '0px',
+              position: 'absolute',
+              top: '128px',
+              left: '128px',
+              border: '8px solid',
+              borderTopLeftRadius: '8px',
+              borderBottomWidth: '0px',
+              borderRightWidth: '0px'
+            }}/>
+            : <div/>
+          }
+
+          {/* Top Left */}
+          { (shouldConnectToNeighbor(up) && shouldConnectToNeighbor(left)) ? 
+            <div style={{
+              backgroundColor: 'black',
+              width: '0px',
+              height: '0px',
+              position: 'absolute',
+              top: '0px',
+              left: '0px',
+              border: '8px solid',
+              borderBottomRightRadius: '8px',
+              borderTopWidth: '0px',
+              borderLeftWidth: '0px'
+            }}/>
+            : <div/>
+          }
+
+          {/* Top right */}
+          { (shouldConnectToNeighbor(up) && shouldConnectToNeighbor(right)) ? 
+            <div style={{
+              backgroundColor: 'black',
+              width: '0px',
+              height: '0px',
+              position: 'absolute',
+              top: '0px',
+              left: '128px',
+              border: '8px solid',
+              borderBottomLeftRadius: '8px',
+              borderTopWidth: '0px',
+              borderRightWidth: '0px'
+            }}/>
+            : <div/>
+          }
         </Paper>
+        
       </div>
 		</div>
   );
