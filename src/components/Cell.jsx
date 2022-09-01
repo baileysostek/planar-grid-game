@@ -7,6 +7,7 @@ import Paper from '@mui/material/Paper';
 // Store Variables
 import { useGameStore } from '../store/GameStore';
 import { useColorStore } from '../store/ColorStore';
+import zIndex from '@mui/material/styles/zIndex';
 
 const defaultSize = 100;
 const hoverSize = 128;
@@ -112,7 +113,7 @@ const Cell = (props) => {
             if(!dragging){
               setHover(true);
             }else{
-              populate(x, y, colors[Math.floor(Math.random() * colors.length)]);
+              populate(x, y, colors[Math.floor(Math.random() * colors.length / 3)]);
             }
           }}
 
@@ -136,23 +137,26 @@ const Cell = (props) => {
             height: cellSize,
             width: cellSize,
             lineHeight: '60px',
-            transition: 'width 0.125s, height 0.125s, background-color 0.125s, transform 0.125s, border-radius 0.125s',
+            transition: 'width 2.5s, height 2.5s, background-color 2.5s, transform 2.5s, border-radius 2.5s',
             transform: 'translate(-50%, -50%)',
 
             backgroundColor: color,
-            color:'rgba(0, 0, 0, 0.87)',
+            color:'#000000',
+			      boxShadow: 'none',
+
+            zIndex:1,
 
             // Control if a border is shown or not.
-            borderTop     : shouldConnectToNeighbor(up) ? 0 : 8,
-            borderBottom  : shouldConnectToNeighbor(down) ? 0 : 8,
-            borderLeft    : shouldConnectToNeighbor(left) ? 0 : 8,
-            borderRight   : shouldConnectToNeighbor(right) ? 0 : 8,
+            borderTop     : shouldConnectToNeighbor(up) ? 0 : 8.5,
+            borderBottom  : shouldConnectToNeighbor(down) ? 0 : 8.5,
+            borderLeft    : shouldConnectToNeighbor(left) ? 0 : 8.5,
+            borderRight   : shouldConnectToNeighbor(right) ? 0 : 8.5,
 
             // Control the padding appended to populated cells.
-            paddingTop     : shouldConnectToNeighbor(up) ? '8px' : '0px',
-            paddingBottom  : shouldConnectToNeighbor(down) ? '8px' : '0px',
-            paddingLeft    : shouldConnectToNeighbor(left) ? '8px' : '0px',
-            paddingRight   : shouldConnectToNeighbor(right) ? '8px' : '0px',
+            paddingTop     : shouldConnectToNeighbor(up) ? ((shouldConnectToNeighbor(left) || shouldConnectToNeighbor(right)) ? '8px' : '8px') : '0px',
+            paddingBottom  : shouldConnectToNeighbor(down) ? ((shouldConnectToNeighbor(left) || shouldConnectToNeighbor(right)) ? '8px' : '8px') : '0px',
+            paddingLeft    : shouldConnectToNeighbor(left) ? ((shouldConnectToNeighbor(up) || shouldConnectToNeighbor(down)) ? '8px' : '8px') : '0px',
+            paddingRight   : shouldConnectToNeighbor(right) ? ((shouldConnectToNeighbor(up) || shouldConnectToNeighbor(down)) ? '8px' : '8px') : '0px',
 
             // Control the rounding level on the corners of the cell.
             borderTopLeftRadius : (shouldConnectToNeighbor(up) || shouldConnectToNeighbor(left)) ? '0px' : '24px',
@@ -161,7 +165,6 @@ const Cell = (props) => {
             borderBottomRightRadius : (shouldConnectToNeighbor(down) || shouldConnectToNeighbor(right)) ? '0px' : '24px',
 
             //Control the Drop shadow around each of our cells
-
           }}
         >
           {/* Debug the values in the cell */}
@@ -169,15 +172,46 @@ const Cell = (props) => {
 
           {source ? "S" : <div></div>}
 
+		      {/* Control the Borders between cells */}
+          {/* left */}
+					{ (shouldConnectToNeighbor(up)) ? 
+            <div 
+              style={{
+                width: `100%`,
+                height: '8px',
+                top: '-4px',
+                left: '0px',
+                position: 'absolute',
+                backgroundColor:color,
+                zIndex:0,
+              }}
+            />
+            : <div/>
+          }
+		      {/* right */}
+          { (shouldConnectToNeighbor(left)) ? 
+            <div 
+              style={{
+                width: '8px',
+                height: `100%`,
+                top: '0px',
+                left: '-4px',
+                position: 'absolute',
+                backgroundColor:color,
+                zIndex:0,
+              }}
+            />
+            : <div/>
+          }
+
           {/* Control Corners between cells */}
           {/* Bottom Left */}
           { (shouldConnectToNeighbor(down) && shouldConnectToNeighbor(left)) ? 
             <div style={{
-              backgroundColor: 'rgba(0, 0, 0, 0.87)',
               width: '0px',
               height: '0px',
               position: 'absolute',
-              top: '128px',
+              top: `${hoverSize}px`,
               left: '0px',
               border: '8px solid',
               borderTopRightRadius: '8px',
@@ -190,12 +224,11 @@ const Cell = (props) => {
           {/* Bottom right */}
           { (shouldConnectToNeighbor(down) && shouldConnectToNeighbor(right)) ? 
             <div style={{
-              backgroundColor: 'rgba(0, 0, 0, 0.87)',
               width: '0px',
               height: '0px',
               position: 'absolute',
-              top: '128px',
-              left: '128px',
+              top: `${hoverSize}px`,
+              left: `${hoverSize}px`,
               border: '8px solid',
               borderTopLeftRadius: '8px',
               borderBottomWidth: '0px',
@@ -207,7 +240,6 @@ const Cell = (props) => {
           {/* Top Left */}
           { (shouldConnectToNeighbor(up) && shouldConnectToNeighbor(left)) ? 
             <div style={{
-              backgroundColor: 'rgba(0, 0, 0, 0.87)',
               width: '0px',
               height: '0px',
               position: 'absolute',
@@ -224,12 +256,11 @@ const Cell = (props) => {
           {/* Top right */}
           { (shouldConnectToNeighbor(up) && shouldConnectToNeighbor(right)) ? 
             <div style={{
-              backgroundColor: 'rgba(0, 0, 0, 0.87)',
               width: '0px',
               height: '0px',
               position: 'absolute',
               top: '0px',
-              left: '128px',
+              left: `${hoverSize}px`,
               border: '8px solid',
               borderBottomLeftRadius: '8px',
               borderTopWidth: '0px',

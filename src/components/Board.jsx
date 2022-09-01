@@ -32,7 +32,8 @@ const Board = (props) => {
         borderRadius: '24px',
         // backgroundColor: '#FF0000'
         border:'8px solid',
-        padding: '24px'
+        padding: '24px',
+        color:'#000000'
       }}
       onMouseLeave={(event) => { 
         setDragging(false);
