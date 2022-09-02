@@ -8,22 +8,15 @@ import Box from '@mui/material/Box';
 import Cell from './Cell';
 
 // Create a React Function component that takes in input props and renders some dom content.
-const Board = (props) => {
-
-  // Define our state variables
-  const [change, setChange] = useState(true);     
+const Board = (props) => { 
 
   // Get everything out of our global stores that we may need
   const setDragging = useGameStore((state) => state.setDragging);
-  const dragging    = useGameStore((state) => state.dragging);
-
-  const grid    = useGameStore((state) => state.grid);
-  const markCellAsSource    = useGameStore((state) => state.markCellAsSource);
 
   const width       = useGameStore((state) => state.width);
   const height      = useGameStore((state) => state.height);
 
-  // markCellAsSource(0, 0, "#FF0000");
+  // markCellAsSource(0, 0, "#FF0000"); 
 
   return (
     // This is the Parent DIV which represents a Board, it contains rows of cells

@@ -81,14 +81,9 @@ export const useGameStore = create((set) => ({
   // This is a store function to load a level from disk. Levels are stored in the JSON format.
 
   // This function sets an object to be a source tile of a color. 
-  markCellAsSource: (x, y, color) => set((state) => {
+  markCellAsSource: (x, y) => set((state) => {
     const grid = [...state.grid];
-
-    // Make sure that the grid cell that we are editing is empty
-    if(grid[x + (y * state.width)]){
-      grid[x + (y * state.width)].soruce = color
-    }
-
+    grid[x + (y * state.width)].source = true;
     return {grid}
   }), 
 

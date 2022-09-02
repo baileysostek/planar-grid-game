@@ -7,10 +7,11 @@ import Paper from '@mui/material/Paper';
 // Store Variables
 import { useGameStore } from '../store/GameStore';
 import { useColorStore } from '../store/ColorStore';
-import zIndex from '@mui/material/styles/zIndex';
 
 const defaultSize = 100;
 const hoverSize = 128;
+
+const TRANSITION_SPEED = '.33s';
 
 // Create a React Function component that takes in input props and renders some dom content.
 const Cell = (props) => {
@@ -25,6 +26,7 @@ const Cell = (props) => {
 
   const populate  = useGameStore((state) => state.populate);
   const getCell   = useGameStore((state) => state.getCell);
+  const colors = useGameStore((state) => state.colors);
 
   const DEFAULT_COLOR    = useColorStore((state) => state.DEFAULT_COLOR);
 
@@ -44,7 +46,7 @@ const Cell = (props) => {
   // This is the representation of if this is a source or destination Cell, or just a regular cell.
   let source = cell?.source;
   if(!source){
-    source = false;
+    source = (value == colors[color]);
   }
 
   // Here we get this cells neighbors
@@ -53,13 +55,7 @@ const Cell = (props) => {
   let left  = getCell(x - 1, y);
   let right = getCell(x + 1, y);
 
-  const red     = useColorStore((state) => state.red);
-  const orange  = useColorStore((state) => state.orange);
-  const yellow  = useColorStore((state) => state.yellow);
-  const green   = useColorStore((state) => state.green);
-  const blue    = useColorStore((state) => state.blue);
-
-  let colors = [red, orange, yellow, green, blue];
+  let directions = [up, down, left, right];
 
   // Internal State
   const [hover, setHover] = useState(false);
@@ -81,14 +77,55 @@ const Cell = (props) => {
         if( Math.abs((value - neighbor?.value)) <= 1 ){
           return true;
         }
+        // If the numbers differ but our neighbor is a source tile we can always connect to it.
+        if( neighbor?.source){
+          return true;
+        }
       }
     }
     return false;
   }
 
-  // This functionality handles a click/select event for a cell
-  const onSelect = () => {
+  const getPopulateColor = () => {
 
+    if(color != DEFAULT_COLOR){
+      return null; // This cell is already populated.
+    }
+
+    // For each direction
+    for(let direction of directions){
+      if(direction){
+        // if the neighbor has a non-default color.
+        if ( direction?.color != DEFAULT_COLOR) {
+          if(dragging){
+            if(direction.color != dragging){
+              continue; // Not the right color.
+            }
+          }
+          if(colors[direction.color]){
+            if(colors[direction.color] == direction.value || direction.source){
+              // This is the largest value for this color.
+              return direction.color;
+            }
+          }
+        }
+      }
+    }
+
+    return null;
+  }
+
+  // This functionality handles a click/select event for a cell
+  const populateCell = () => {
+    // populate(x, y, colors[Math.floor(Math.random() * colors.length )]);
+    // A cell can only be populated if it is adjacent to a color with a value of the highest color number.
+    const populateColor = getPopulateColor();
+    if(populateColor){
+      if(!!!dragging){
+        setDragging(populateColor)
+      }
+      populate(x, y, populateColor);
+    }
   }
 
   return (
@@ -108,12 +145,11 @@ const Cell = (props) => {
         }}
       >
         <Paper 
-          
           onMouseOver={() => {
             if(!dragging){
               setHover(true);
             }else{
-              populate(x, y, colors[Math.floor(Math.random() * colors.length / 3)]);
+              populateCell();
             }
           }}
 
@@ -123,8 +159,7 @@ const Cell = (props) => {
 
           onMouseDown={(event) => {
             event.preventDefault();
-            setDragging(true); //TODO this should be the tile we are dragging.
-            populate(x, y, colors[Math.floor(Math.random() * colors.length)]);
+            populateCell();
           }}
 
           onMouseUp={(event) => {
@@ -137,7 +172,7 @@ const Cell = (props) => {
             height: cellSize,
             width: cellSize,
             lineHeight: '60px',
-            transition: 'width 2.5s, height 2.5s, background-color 2.5s, transform 2.5s, border-radius 2.5s',
+            transition: `width ${TRANSITION_SPEED}, height ${TRANSITION_SPEED}, background-color ${TRANSITION_SPEED}, transform ${TRANSITION_SPEED}, border-radius ${TRANSITION_SPEED}`,
             transform: 'translate(-50%, -50%)',
 
             backgroundColor: color,
@@ -173,101 +208,35 @@ const Cell = (props) => {
           {source ? "S" : <div></div>}
 
 		      {/* Control the Borders between cells */}
-          {/* left */}
-					{ (shouldConnectToNeighbor(up)) ? 
-            <div 
-              style={{
-                width: `100%`,
-                height: '8px',
-                top: '-4px',
-                left: '0px',
-                position: 'absolute',
-                backgroundColor:color,
-                zIndex:0,
-              }}
-            />
-            : <div/>
-          }
-		      {/* right */}
-          { (shouldConnectToNeighbor(left)) ? 
-            <div 
-              style={{
-                width: '8px',
-                height: `100%`,
-                top: '0px',
-                left: '-4px',
-                position: 'absolute',
-                backgroundColor:color,
-                zIndex:0,
-              }}
-            />
-            : <div/>
-          }
-
-          {/* Control Corners between cells */}
-          {/* Bottom Left */}
-          { (shouldConnectToNeighbor(down) && shouldConnectToNeighbor(left)) ? 
-            <div style={{
-              width: '0px',
-              height: '0px',
-              position: 'absolute',
-              top: `${hoverSize}px`,
+          {/* Vertical Axis */}
+          <div 
+            style={{
+              width: `100%`,
+              height: shouldConnectToNeighbor(up) ? '8px' : '0px',
+              top: shouldConnectToNeighbor(up) ? '-4px' : '4px',
               left: '0px',
-              border: '8px solid',
-              borderTopRightRadius: '8px',
-              borderBottomWidth: '0px',
-              borderLeftWidth: '0px'
-            }}/>
-            : <div/>
-          }
-
-          {/* Bottom right */}
-          { (shouldConnectToNeighbor(down) && shouldConnectToNeighbor(right)) ? 
-            <div style={{
-              width: '0px',
-              height: '0px',
               position: 'absolute',
-              top: `${hoverSize}px`,
-              left: `${hoverSize}px`,
-              border: '8px solid',
-              borderTopLeftRadius: '8px',
-              borderBottomWidth: '0px',
-              borderRightWidth: '0px'
-            }}/>
-            : <div/>
-          }
-
-          {/* Top Left */}
-          { (shouldConnectToNeighbor(up) && shouldConnectToNeighbor(left)) ? 
-            <div style={{
-              width: '0px',
-              height: '0px',
-              position: 'absolute',
+              backgroundColor:shouldConnectToNeighbor(up) ? color : DEFAULT_COLOR,
+              zIndex:0,
+              transition: `width ${TRANSITION_SPEED}, height ${TRANSITION_SPEED}, top ${TRANSITION_SPEED}, background-color ${TRANSITION_SPEED}`,
+            }}
+          />
+					
+		      {/* Horisontal Axis */}
+          <div 
+            style={{
+              width: shouldConnectToNeighbor(left) ? '8px' : '0px',
+              height: '100%',
               top: '0px',
-              left: '0px',
-              border: '8px solid',
-              borderBottomRightRadius: '8px',
-              borderTopWidth: '0px',
-              borderLeftWidth: '0px'
-            }}/>
-            : <div/>
-          }
-
-          {/* Top right */}
-          { (shouldConnectToNeighbor(up) && shouldConnectToNeighbor(right)) ? 
-            <div style={{
-              width: '0px',
-              height: '0px',
+              left: shouldConnectToNeighbor(left) ? '-4px' : '4px',
               position: 'absolute',
-              top: '0px',
-              left: `${hoverSize}px`,
-              border: '8px solid',
-              borderBottomLeftRadius: '8px',
-              borderTopWidth: '0px',
-              borderRightWidth: '0px'
-            }}/>
-            : <div/>
-          }
+              backgroundColor:shouldConnectToNeighbor(left) ? color : DEFAULT_COLOR,
+              zIndex:0,
+              transition: `width ${TRANSITION_SPEED}, height ${TRANSITION_SPEED}, left ${TRANSITION_SPEED}, background-color ${TRANSITION_SPEED}`,
+            }}
+          />
+
+          
         </Paper>
         
       </div>
