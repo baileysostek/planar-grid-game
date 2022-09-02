@@ -7,6 +7,8 @@ import Paper from '@mui/material/Paper';
 // Store Variables
 import { useGameStore } from '../store/GameStore';
 import { useColorStore } from '../store/ColorStore';
+import { Typography } from '@mui/material';
+import Box from '@mui/material/Box';
 
 const defaultSize = 100;
 const hoverSize = 128;
@@ -26,7 +28,7 @@ const Cell = (props) => {
 
   const populate  = useGameStore((state) => state.populate);
   const getCell   = useGameStore((state) => state.getCell);
-  const colors = useGameStore((state) => state.colors);
+  const setSource   = useGameStore((state) => state.setSource);
 
   const DEFAULT_COLOR    = useColorStore((state) => state.DEFAULT_COLOR);
 
@@ -41,12 +43,6 @@ const Cell = (props) => {
   let value = cell?.value;
   if(!value){
     value = 0;
-  }
-
-  // This is the representation of if this is a source or destination Cell, or just a regular cell.
-  let source = cell?.source;
-  if(!source){
-    source = (value == colors[color]);
   }
 
   // Here we get this cells neighbors
@@ -77,54 +73,72 @@ const Cell = (props) => {
         if( Math.abs((value - neighbor?.value)) <= 1 ){
           return true;
         }
-        // If the numbers differ but our neighbor is a source tile we can always connect to it.
-        if( neighbor?.source){
-          return true;
-        }
+        // // If the numbers differ but our neighbor is a source tile we can always connect to it.
+        // if( neighbor?.source){
+        //   return true;
+        // }
       }
     }
     return false;
   }
 
-  const getPopulateColor = () => {
+  const calculateCellParent = () => {
 
     if(color != DEFAULT_COLOR){
       return null; // This cell is already populated.
     }
+
+    let current_max = null;
 
     // For each direction
     for(let direction of directions){
       if(direction){
         // if the neighbor has a non-default color.
         if ( direction?.color != DEFAULT_COLOR) {
+
+          if(!!!(direction?.source)){
+            continue; // Not a source tile
+          }
+
+          // If we are dragging
           if(dragging){
+            // If we are dragging a color different from this color, continue.
             if(direction.color != dragging){
               continue; // Not the right color.
             }
           }
-          if(colors[direction.color]){
-            if(colors[direction.color] == direction.value || direction.source){
-              // This is the largest value for this color.
-              return direction.color;
-            }
+
+          // This is the right color to populate this cell with.
+          if(current_max == null || (!!current_max && current_max.value < direction.value)){
+            current_max = direction;
           }
         }
       }
     }
 
-    return null;
+    // Now we check if we have found a parent, if we have we need to invalidate it and set ourself to a source tile
+    if(!!current_max){
+      setSource(current_max.x, current_max.y, false);
+    }
+
+    return current_max;
   }
 
   // This functionality handles a click/select event for a cell
   const populateCell = () => {
     // populate(x, y, colors[Math.floor(Math.random() * colors.length )]);
     // A cell can only be populated if it is adjacent to a color with a value of the highest color number.
-    const populateColor = getPopulateColor();
-    if(populateColor){
+    const parent = calculateCellParent();
+
+    if(parent){
+      // If we are not dragging, set that we are dragging this color
       if(!!!dragging){
-        setDragging(populateColor)
+        setDragging(parent.color)
       }
-      populate(x, y, populateColor);
+
+      // Populate this cell with the color of its parent, and the value of its parent + 1
+      populate(x, y, parent.color, parent.value + 1);
+      setSource(x, y, true);
     }
   }
 
@@ -203,9 +217,20 @@ const Cell = (props) => {
           }}
         >
           {/* Debug the values in the cell */}
-          {/* {`${x}, ${y}, ${value}`} */}
+          {value > 0 ? 
+            <Box sx={{
+              height: `${hoverSize}px`,
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "center"
+            }}>
+              <Typography align='center' alignContent={'center'} variant='h3'>
+                {value}
+              </Typography> 
+            </Box>
+          : <div/> }
 
-          {source ? "S" : <div></div>}
+          {/* {source ? `${value}` : <div></div>} */}
 
 		      {/* Control the Borders between cells */}
           {/* Vertical Axis */}

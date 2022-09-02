@@ -39,7 +39,10 @@ const Controls = (props) => {
           for(let i = 0; i < Math.floor(Math.random() * 8) + 1; i++){
             let x = Math.floor(Math.random() * 8);
             let y = Math.floor(Math.random() * 5)
-            populate(x, y, all_colors[Math.floor(Math.random() * all_colors.length)]);
+
+            let color =  all_colors[Math.floor(Math.random() * all_colors.length)];
+
+            populate(x, y, all_colors[Math.floor(Math.random() * all_colors.length)], 0);
             markCellAsSource(x, y);
           }
         }}
