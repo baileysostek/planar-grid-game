@@ -13,6 +13,8 @@ const Board = (props) => {
   // Get everything out of our global stores that we may need
   const setDragging = useGameStore((state) => state.setDragging);
 
+  const win   = useGameStore((state) => state.win);
+
   let width = props.level.width;
   let height = props.level.height;
 
@@ -23,6 +25,7 @@ const Board = (props) => {
         setDragging(false);
       }}
     >
+      {win ? <div> Win!</div> : <></>}
       {[...Array(height)].map((item, index_row) => (
         <Box
           key={index_row}

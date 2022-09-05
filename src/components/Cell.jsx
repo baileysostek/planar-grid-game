@@ -27,6 +27,7 @@ const Cell = React.forwardRef((props, ref) => {
 	const setDragging = useGameStore((state) => state.setDragging);
 
   const populate  = useGameStore((state) => state.populate);
+  const winCheck  = useGameStore((state) => state.winCheck);
   const getCell   = useGameStore((state) => state.getCell);
   const setSource   = useGameStore((state) => state.setSource);
 
@@ -210,6 +211,9 @@ const Cell = React.forwardRef((props, ref) => {
 
       // Make sure we set this cell's border color back to the default border color
       setBorderColor('#000000');
+
+      // Check for win
+      winCheck();
     }
   }
 

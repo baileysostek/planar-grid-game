@@ -1,6 +1,6 @@
 import create from 'zustand'
 
-import colors from '../store/Colors';
+import colors, { DEFAULT_COLOR } from '../store/Colors';
 
 // This is a global store to hold our game data. These stores can be referenced within any child components by using the useStore Hook
 export const useGameStore = create((set) => ({
@@ -14,7 +14,9 @@ export const useGameStore = create((set) => ({
 
   // Grid width and height information
   width:8,
-  height:5,
+  setWidth: (width) => set(() => ({ width: width })),
+  height:8,
+  setHeight: (height) => set(() => ({ height: height })),
 
   // The currently loaded level
   loadedLevel: null,
@@ -51,26 +53,110 @@ export const useGameStore = create((set) => ({
 
     grid[x + (y * state.width)].parent = parent;
 
+    return {
+      grid:grid,
+    }
+  }), 
+
+  winCheck: () => set((state) => {
+    
     // Check for win here. 
-    let win = true
+    let win = true; // We assume we are in a won state and search for violations of that assumption. 
+    let colorBuffer = new Map();
+    
+    // Win checking logic.
     loop:for(let j = 0; j < state.height; j++){
       for(let i = 0; i < state.width; i++){
-        // Make sure a grid has a value
-        if(!grid[i + (j * state.width)]){
-          win = false;
-          console.log(grid[i + (j * state.width)])
+        // If we failed break the loop.
+        if(!win){
           break loop;
+        } 
+
+        // If a grid cell does not have a value, this is a failure state. 
+        if(!state.grid[i + (j * state.width)]){
+          win = false;
+          continue;
+        }else{
+          // Get the Grid cell
+          let cell = state.grid[i + (j * state.width)];
+
+          // If this cell does not have a color
+          if(!cell.color){
+            win = false;
+            continue;
+          }else{
+            if(cell.color == DEFAULT_COLOR){
+              win = false;
+              continue;
+            }
+          }
+
+          // In this case we DO have a grid cell with a color and a value, we want to make sure that each color only has ONE entry for each numeric value, this means that we only have 1 path of each color
+          // initialize Set Map if we dont have a set for this color.
+          if(!colorBuffer.has(cell.color)){
+            colorBuffer.set(cell.color, new Set());
+          }
+
+          // Make sure that our set does not contain this value for this color yet.
+          if(cell.value > 0){
+            if(!(colorBuffer.get(cell.color).has(cell.value))){
+              // Insert our value into the color set
+              (colorBuffer.get(cell.color)).add(cell.value);
+            }else{
+              // We already have a cell of this color with this value, this is a failure state.
+              win = false;
+              continue;
+            }
+          }
+
+          // Check to see if this is a source tile
+          if(!!cell.source){
+
+            // if this is a source tile, it NEEDS to be adjacent to another source tile of the same color.
+            let neighborCoords = [
+              {x:cell.x , y:cell.y - 1}, // UP
+              {x:cell.x , y:cell.y + 1}, // DOWN
+              {x:cell.x - 1 , y:cell.y}, // LEFT
+              {x:cell.x + 1 , y:cell.y}, // RIGHT
+            ];
+
+            // For each neighbor we need to check...
+            let adjacentToValidSourceTile = false;
+            
+            for(let coords of neighborCoords){
+              if(coords.x >= 0 && coords.x < state.width){
+                if(coords.y >= 0 && coords.y < state.width){
+                  let index = (coords.x + (coords.y * state.width))
+                  // Bounds check
+                  if(index >= 0 && index < (state.width * state.height)){
+                    if(state.grid[index]){
+                      let neighbor = state.grid[index];
+                      if(neighbor.color == cell.color){
+                        if(neighbor.source){
+                          adjacentToValidSourceTile = true; // We have a neighbor.
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+
+            // We found an invalid case
+            if(!adjacentToValidSourceTile){
+              win = false;
+              continue;
+            }
+          }
         }
       }
     }
 
-    console.log("Win?", win);
-
-    return {
-      grid:grid,
-      win:win,
+    return{
+      win:win
     }
-  }), 
+
+  }),
 
   // This function populates a cell with a color
   getCell: (x, y) => useGameStore((state) => {
@@ -133,6 +219,9 @@ export const useGameStore = create((set) => ({
 
   loadLevel: (level)  => set((state) => {
 
+    state.setWidth(level.width);
+    state.setHeight(level.height);
+
     state.reset();
 
     // Place all sources in the level
@@ -151,8 +240,6 @@ export const useGameStore = create((set) => ({
 
     return {
       loadedLevel: level,
-      width: level.width,
-      height: level.height,
     }
   }), 
 
