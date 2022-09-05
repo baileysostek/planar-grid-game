@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 
 // Material UI Imports
 import Paper from '@mui/material/Paper';
@@ -16,7 +16,7 @@ const hoverSize = 128;
 const TRANSITION_SPEED = '.33s';
 
 // Create a React Function component that takes in input props and renders some dom content.
-const Cell = (props) => {
+const Cell = React.forwardRef((props, ref) => {
 
   // Here we define all of the properties that a cell has
   let x = props.x;
@@ -29,6 +29,9 @@ const Cell = (props) => {
   const populate  = useGameStore((state) => state.populate);
   const getCell   = useGameStore((state) => state.getCell);
   const setSource   = useGameStore((state) => state.setSource);
+
+  // Get a ref to our rendered div.
+  const component = React.useRef();
 
   // Extract information from the global state an put it into this cell.
   let cell = getCell(x, y);
@@ -55,6 +58,11 @@ const Cell = (props) => {
     parent = null;
   }
 
+  let child = cell?.child;
+  if(!child){
+    child = null;
+  }
+
   // Here we get this cells neighbors
   let up    = getCell(x, y - 1);
   let down  = getCell(x, y + 1);
@@ -69,35 +77,6 @@ const Cell = (props) => {
   // Determine the cell size here
   const cellSize = (hover || !(color == DEFAULT_COLOR)) ? hoverSize : defaultSize;
 
-  // Helper function to determine if this cell is related to another cell via ancestor propagation.
-  const isRelatedToSource = (possibleParent) => {
-    let curParent = getCell(x, y);
-
-    console.log(curParent.x, curParent.y);
-
-    while(curParent != null){
-
-      console.log(curParent.x, curParent.y);
-
-      // If curParent is a source tile
-      if(curParent.source){
-        if(curParent.x == possibleParent.x && curParent.y == possibleParent.y ){
-          // They the same!
-          return true;
-        }
-      }
-
-      // We didnt find what we were looking for so lets continue
-      if(curParent.parent){
-        curParent = curParent.parent;
-      }else{
-        break;
-      }
-    }
-
-    return false;
-  } 
-
   // Here we are defining helper functions to check if we have a neighbor above us that we should connect visually to.
   const shouldConnectToNeighbor = (neighbor) => {
     if(neighbor){
@@ -105,29 +84,29 @@ const Cell = (props) => {
       if(neighbor?.color == DEFAULT_COLOR){
         return false;
       }
+      
+      // if the neighbor is our parent we can connect to it.
+      if(neighbor == parent){
+        return true;
+      }
 
-      // if the neighbor color is the same as our color, return true
-      if ( neighbor?.color == color ) {
+      // If the neighbor is our child we can connect to it.
+      if(neighbor == child){
+        return true;
+      }
 
-        // TODO add check that numeric value is increased by 1.
-        if( Math.abs((value - neighbor?.value)) <= 1 ){
-          return true;
-        }
-        // If the numbers differ but our neighbor is a source tile we can always connect to it.
-        if( neighbor?.value == 0 && source){
-          return true;
-        }
-
-        // Connect the source tile to the line end
-        if( value == 0 && neighbor?.source){
+      // If we are a source tile and we see a source tile next to us of the same color, we can connect to it
+      if(neighbor?.color == color){
+        if(neighbor?.source && source){
           return true;
         }
       }
+
     }
     return false;
   }
 
-  const calculateCellParent = () => {
+  const calculateCellParent = (screenPos) => {
 
     if(color != DEFAULT_COLOR){
       return null; // This cell is already populated.
@@ -156,9 +135,46 @@ const Cell = (props) => {
           // This is the right color to populate this cell with.
           if(current_max == null || (!!current_max && current_max.value < direction.value)){
             current_max = direction;
+          }else{
+            if((!!current_max && current_max.value == direction.value)){
+              // Turn current_max into an array
+              if(!Array.isArray(current_max)){
+                current_max = [current_max];
+              }
+              // Push onto array
+              current_max.push(direction);
+            }
           }
         }
       }
+    }
+
+    // Sometimes we have an array here, if we have an array we need to reduce the elements to a single array. 
+    // Sort these elements by distance to see which we are closest to.
+    if(Array.isArray(current_max)){
+
+      // Start with a really big number
+      let closestDistance = Number.MAX_VALUE;
+      let closestElement = null;
+      for(let element of current_max){
+        // Calculate distances for each element.
+        let elementX = (element.x * hoverSize) + hoverSize / 2;
+        let elementY = (element.y * hoverSize) + hoverSize / 2;
+
+        // Now we do some maths.
+        // Credit here to our friend Pythagoras, this is code i wrote based off of his theorem 
+        // Two point distance function, sqrt(x^2 + y^2)
+        let distance = Math.sqrt((elementX - screenPos.x) * (elementX - screenPos.x) + (elementY - screenPos.y) * (elementY - screenPos.y));
+
+        if(distance <= closestDistance){
+          closestDistance = distance;
+          closestElement = element;
+        }
+      }
+      
+      // Reduce cur_max to a single element. No longer an array
+      current_max = closestElement;
+      // NOW current_max is a single element.
     }
 
     // Now we check if we have found a parent, if we have we need to invalidate it and set ourself to a source tile
@@ -170,10 +186,10 @@ const Cell = (props) => {
   }
 
   // This functionality handles a click/select event for a cell
-  const populateCell = () => {
+  const populateCell = (screenPos = null) => {
     // populate(x, y, colors[Math.floor(Math.random() * colors.length )]);
     // A cell can only be populated if it is adjacent to a color with a value of the highest color number.
-    const parent = calculateCellParent();
+    const parent = calculateCellParent(screenPos);
 
     if(parent){
       // If we are not dragging, set that we are dragging this color
@@ -184,13 +200,43 @@ const Cell = (props) => {
       // Populate this cell with the color of its parent, and the value of its parent + 1
       populate(x, y, parent.color, parent.value + 1, parent);
       setSource(x, y, true);
-
-      console.log(parent);
     }
+  }
+
+  // This function gets us the relative world coordinates from a mouse event. This will let us detect which cell we are closest to.
+  const calculateRelativeMouseCoords = (event)=> {
+
+    // This is the start position, we want relative position so we need to do some recursive backtracking.
+    let screenX = event.pageX;
+    let screenY = event.pageY;
+
+    let x = 0;
+    let y = 0;
+
+    let parent = component.current;
+    let index = 0;
+    while(parent){
+
+      // TODO maybe do a better way of getting the root element.
+      // ALSO 8 = border + 8 = border + 24 = margin === 40 offset from root.
+      if(index == 4){
+        x = screenX - parent.offsetLeft + (parent.offsetWidth / 2) - (8 + 8 + 24);
+        y = screenY - parent.offsetTop + (parent.offsetHeight / 2) - (8 + 8 + 24);
+        console.log(x, y);
+        break;
+      }
+
+      parent = parent.parentElement;
+      index++;
+    }
+
+    return {x:x, y:y}
+
   }
 
   return (
 		<div
+      ref={component}
       style={{
 				width:hoverSize,
 				height:hoverSize
@@ -206,7 +252,7 @@ const Cell = (props) => {
         }}
       >
         <Paper 
-          onMouseOver={() => {
+          onMouseOver={(event) => {
             if(!dragging){
               setHover(true);
             }else{
@@ -219,8 +265,10 @@ const Cell = (props) => {
           }}
 
           onMouseDown={(event) => {
+            // Here we need to do some math to see what cell we are closest to.
+
             event.preventDefault();
-            populateCell();
+            populateCell(calculateRelativeMouseCoords(event));
           }}
 
           onMouseUp={(event) => {
@@ -314,6 +362,6 @@ const Cell = (props) => {
       </div>
 		</div>
   );
-}
+})
 
 export default Cell;

@@ -38,7 +38,10 @@ const LevelSelect = (props) => {
       name:"level 1",
       width:3,
       height:3,
-      sources:[],
+      sources:[
+        {x:0, y:0, color:'red'},
+        {x:2, y:2, color:'red'},
+      ],
       blockers:[{x:0, y:0}]
     },
     {
@@ -46,7 +49,7 @@ const LevelSelect = (props) => {
       width:4,
       height:2,
       sources:[
-        {x:0, y:0, color:'red'},
+        {x:0, y:1, color:'red'},
         {x:2, y:0, color:'red'},
         {x:3, y:0, color:'orange'},
         {x:2, y:1, color:'orange'},

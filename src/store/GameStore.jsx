@@ -40,6 +40,12 @@ export const useGameStore = create((set) => ({
 
     grid[x + (y * state.width)].color = color;
     grid[x + (y * state.width)].value = value;
+
+    if(parent){
+      grid[parent.x + (parent.y * state.width)].child = grid[x + (y * state.width)];
+      parent = grid[parent.x + (parent.y * state.width)];
+    }
+
     grid[x + (y * state.width)].parent = parent;
 
     return {grid}
@@ -117,8 +123,6 @@ export const useGameStore = create((set) => ({
         color = source.color;
       }
 
-      console.log(JSON.stringify(colors));
-
       state.populate(x, y, color, 0);
       state.markCellAsSource(x, y);
     }
@@ -140,6 +144,7 @@ function new_Cell(x, y) {
     y:y,
 
     parent:null,
+    child:null,
 
     color:colors.DEFAULT_COLOR,
     value:0
