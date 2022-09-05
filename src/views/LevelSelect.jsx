@@ -4,12 +4,29 @@ import { ThemeProvider } from '@mui/material/styles';
 
 import { useGameStore } from '../store/GameStore'
 import { useThemeStore } from '../store/ThemeStore'
-import { useColorStore } from '../store/ColorStore'
 
 import Board from '../components/Board';
 import Controls from '../components/Controls';
 
 import { Modal } from '@mui/material';
+
+import Backdrop from '@mui/material/Backdrop';
+import Box from '@mui/material/Box';
+import Fade from '@mui/material/Fade';
+
+// CSS
+const style = {
+  position: 'absolute',
+  top: '50%',
+  left: '50%',
+  transform: 'translate(-50%, -50%)',
+  width: 'auto',
+  boxShadow: 24,
+  p: 4,
+  padding:'0px',
+  borderRadius:'24px',
+  backgroundColor:'#3A5A40'
+};
 
 // Create a function to render our board.
 const LevelSelect = (props) => {
@@ -28,7 +45,12 @@ const LevelSelect = (props) => {
       name:"level 2",
       width:4,
       height:2,
-      sources:[],
+      sources:[
+        {x:0, y:0, color:'red'},
+        {x:2, y:0, color:'red'},
+        {x:3, y:0, color:'orange'},
+        {x:2, y:1, color:'orange'},
+      ],
       blockers:[{x:0, y:0}]
     },
     {
@@ -60,14 +82,10 @@ const LevelSelect = (props) => {
   const populate = useGameStore((state) => state.populate);
   const markCellAsSource = useGameStore((state) => state.markCellAsSource);
 
-  // All of the Games colors.
-  const red     = useColorStore((state) => state.red);
-  const orange  = useColorStore((state) => state.orange);
-  const yellow  = useColorStore((state) => state.yellow);
-  const green   = useColorStore((state) => state.green);
-  const blue    = useColorStore((state) => state.blue);
-
-  let all_colors = [red, orange, yellow, green, blue];
+  const handleClose = () => {
+    unloadLevel();
+    console.log("unloadLevel");
+  }
 
   const unloadLevel = () => {
     reset();
@@ -81,17 +99,6 @@ const LevelSelect = (props) => {
             onClick={() => {
               if(!loadedLevel){
                 loadLevel(level);
-
-                // Logic to load the level
-                for(let i = 0; i < Math.floor(Math.random() * 8) + 1; i++){
-                  let x = Math.floor(Math.random() * level.width);
-                  let y = Math.floor(Math.random() * level.height)
-
-                  let color =  all_colors[Math.floor(Math.random() * all_colors.length)];
-
-                  populate(x, y, color, 0);
-                  markCellAsSource(x, y);
-                }
               }
             }}
           >
@@ -99,29 +106,39 @@ const LevelSelect = (props) => {
           </div>
         ))
       }
-      <Modal
-        open={!!loadedLevel}
-        onClose={() => {
-          unloadLevel();
-          console.log("unloadLevel");
-        }}
-      >
-        {!!loadedLevel ? <div 
-          style={{
-            borderRadius: '24px',
-            border:'8px solid',
-            padding: '24px',
-            color:'#000000',
-            overflow:'hidden',
-            width:`${((loadedLevel.width+ 1) * 128)}px` ,
-            height:`${((loadedLevel.height + 1) * 128)}px`
+      <div>
+        <Modal
+          aria-labelledby="transition-modal-title"
+          aria-describedby="transition-modal-description"
+          open={!!loadedLevel}
+          onClose={handleClose}
+          closeAfterTransition
+          BackdropComponent={Backdrop}
+          BackdropProps={{
+            timeout: 500,
           }}
         >
-          {/* If there is a level loaded, lets display that board */}
-          <Board level={loadedLevel}/>
-          <Controls/>
-        </div> : <></>}
-      </Modal>
+          <Fade in={!!loadedLevel}>
+            <Box sx={style}>
+              {!!loadedLevel ? <div 
+                style={{
+                  borderRadius: '24px',
+                  border:'8px solid',
+                  padding: '24px',
+                  color:'#000000',
+                  overflow:'hidden',
+                  width: 'auto',
+                    width: 'auto',
+                }}
+              >
+                {/* If there is a level loaded, lets display that board */}
+                <Board level={loadedLevel}/>
+                <Controls/>
+              </div> : <></>}
+            </Box>
+          </Fade>
+        </Modal>
+      </div>
     </ThemeProvider>
   );
 }

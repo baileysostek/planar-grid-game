@@ -6,7 +6,7 @@ import Paper from '@mui/material/Paper';
 
 // Store Variables
 import { useGameStore } from '../store/GameStore';
-import { useColorStore } from '../store/ColorStore';
+import { DEFAULT_COLOR } from '../store/Colors';
 import { Typography } from '@mui/material';
 import Box from '@mui/material/Box';
 
@@ -29,8 +29,6 @@ const Cell = (props) => {
   const populate  = useGameStore((state) => state.populate);
   const getCell   = useGameStore((state) => state.getCell);
   const setSource   = useGameStore((state) => state.setSource);
-
-  const DEFAULT_COLOR    = useColorStore((state) => state.DEFAULT_COLOR);
 
   // Extract information from the global state an put it into this cell.
   let cell = getCell(x, y);

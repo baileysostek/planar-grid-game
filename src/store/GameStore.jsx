@@ -1,6 +1,6 @@
 import create from 'zustand'
 
-const DEFAULT_COLOR = "#282c34";
+import colors from '../store/Colors';
 
 // This is a global store to hold our game data. These stores can be referenced within any child components by using the useStore Hook
 export const useGameStore = create((set) => ({
@@ -78,14 +78,9 @@ export const useGameStore = create((set) => ({
   // Here we will define global actions that users can perform
   reloadLevel: ()  => set((state) => {
 
-    const grid = new Array(state.width * state.height);
+    state.loadLevel(state.loadedLevel);
 
-    // TODO code to regenerate the grid.
-
-    return {
-      dragging: null,
-      grid: grid
-    }
+    return {};
   }), 
 
   // This is a store function to load a level from disk. Levels are stored in the JSON format.
@@ -109,6 +104,25 @@ export const useGameStore = create((set) => ({
   }), 
 
   loadLevel: (level)  => set((state) => {
+
+    state.reset();
+
+    // Place all sources in the level
+    for(let source of level?.sources){
+      let x = source.x;
+      let y = source.y;
+
+      let color =  colors[source.color];
+      if(color == undefined){
+        color = source.color;
+      }
+
+      console.log(JSON.stringify(colors));
+
+      state.populate(x, y, color, 0);
+      state.markCellAsSource(x, y);
+    }
+
     return {
       loadedLevel: level,
     }
@@ -127,7 +141,7 @@ function new_Cell(x, y) {
 
     parent:null,
 
-    color:DEFAULT_COLOR,
+    color:colors.DEFAULT_COLOR,
     value:0
   }
 }

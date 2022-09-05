@@ -1,6 +1,4 @@
-import create from 'zustand'
-
-export const useColorStore = create((set) => ({
+module.exports = Colors = {
     text        : '#FFFCF2',
     background  : '#282c34',
     primary     : '#403D39',
@@ -14,5 +12,4 @@ export const useColorStore = create((set) => ({
     blue        : '#8Cb369',
 
     DEFAULT_COLOR : "#282c34",
-    
-}));
+}
