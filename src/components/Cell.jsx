@@ -45,6 +45,18 @@ const Cell = (props) => {
     value = 0;
   }
 
+  // This is the numeric value of this cell
+  let source = cell?.source;
+  if(!source){
+    source = false;
+  }
+
+  // This is the numeric value of this cell
+  let parent = cell?.parent;
+  if(!parent){
+    parent = null;
+  }
+
   // Here we get this cells neighbors
   let up    = getCell(x, y - 1);
   let down  = getCell(x, y + 1);
@@ -59,6 +71,35 @@ const Cell = (props) => {
   // Determine the cell size here
   const cellSize = (hover || !(color == DEFAULT_COLOR)) ? hoverSize : defaultSize;
 
+  // Helper function to determine if this cell is related to another cell via ancestor propagation.
+  const isRelatedToSource = (possibleParent) => {
+    let curParent = getCell(x, y);
+
+    console.log(curParent.x, curParent.y);
+
+    while(curParent != null){
+
+      console.log(curParent.x, curParent.y);
+
+      // If curParent is a source tile
+      if(curParent.source){
+        if(curParent.x == possibleParent.x && curParent.y == possibleParent.y ){
+          // They the same!
+          return true;
+        }
+      }
+
+      // We didnt find what we were looking for so lets continue
+      if(curParent.parent){
+        curParent = curParent.parent;
+      }else{
+        break;
+      }
+    }
+
+    return false;
+  } 
+
   // Here we are defining helper functions to check if we have a neighbor above us that we should connect visually to.
   const shouldConnectToNeighbor = (neighbor) => {
     if(neighbor){
@@ -69,14 +110,20 @@ const Cell = (props) => {
 
       // if the neighbor color is the same as our color, return true
       if ( neighbor?.color == color ) {
+
         // TODO add check that numeric value is increased by 1.
         if( Math.abs((value - neighbor?.value)) <= 1 ){
           return true;
         }
-        // // If the numbers differ but our neighbor is a source tile we can always connect to it.
-        // if( neighbor?.source){
-        //   return true;
-        // }
+        // If the numbers differ but our neighbor is a source tile we can always connect to it.
+        if( neighbor?.value == 0 && source){
+          return true;
+        }
+
+        // Connect the source tile to the line end
+        if( value == 0 && neighbor?.source){
+          return true;
+        }
       }
     }
     return false;
@@ -137,8 +184,10 @@ const Cell = (props) => {
       }
 
       // Populate this cell with the color of its parent, and the value of its parent + 1
-      populate(x, y, parent.color, parent.value + 1);
+      populate(x, y, parent.color, parent.value + 1, parent);
       setSource(x, y, true);
+
+      console.log(parent);
     }
   }
 

@@ -20,7 +20,7 @@ export const useGameStore = create((set) => ({
   grid:[],
 
   // This function populates a cell with a color
-  populate: (x, y, color, value) => set((state) => {
+  populate: (x, y, color, value, parent = null) => set((state) => {
     const grid = [...state.grid];
 
     // Make sure that the grid cell that we are editing is empty
@@ -37,6 +37,7 @@ export const useGameStore = create((set) => ({
 
     grid[x + (y * state.width)].color = color;
     grid[x + (y * state.width)].value = value;
+    grid[x + (y * state.width)].parent = parent;
 
     return {grid}
   }), 
@@ -101,6 +102,8 @@ function new_Cell(x, y) {
 
     x:x,
     y:y,
+
+    parent:null,
 
     color:DEFAULT_COLOR,
     value:0
