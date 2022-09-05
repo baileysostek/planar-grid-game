@@ -13,21 +13,12 @@ const Board = (props) => {
   // Get everything out of our global stores that we may need
   const setDragging = useGameStore((state) => state.setDragging);
 
-  const width       = useGameStore((state) => state.width);
-  const height      = useGameStore((state) => state.height);
-
-  // markCellAsSource(0, 0, "#FF0000"); 
+  let width = props.level.width;
+  let height = props.level.height;
 
   return (
     // This is the Parent DIV which represents a Board, it contains rows of cells
     <div
-      style={{
-        borderRadius: '24px',
-        // backgroundColor: '#FF0000'
-        border:'8px solid',
-        padding: '24px',
-        color:'#000000'
-      }}
       onMouseLeave={(event) => { 
         setDragging(false);
       }}

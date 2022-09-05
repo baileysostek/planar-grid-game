@@ -3,6 +3,7 @@ import './App.css';
 
 // Import our Views
 import Game from './views/Game';
+import LevelSelect from './views/LevelSelect';
 
 // Create a function component to render our Application.
 function App() {
@@ -10,7 +11,7 @@ function App() {
     <div className="App">
       <header className="App-header">
        
-        <Game></Game>
+        <LevelSelect></LevelSelect>
       </header>
     </div>
   );

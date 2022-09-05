@@ -12,17 +12,16 @@ import Controls from '../components/Controls';
 // Create a function to render our board.
 const Game = (props) => {
 
-  // Define our state variables
-  const [change, setChange] = useState(true);     
-
-  const bears = useGameStore((state) => state.bears)
-
   // Get everything out of our global stores that we may need
   const theme = useThemeStore((state) => state.theme);
 
+  if(!props.level){
+    return <div></div>
+  }
+
   return (
     <ThemeProvider theme={theme}>
-      <Board/>
+      <Board level={props.level}/>
       <Controls/>
     </ThemeProvider>
   );
