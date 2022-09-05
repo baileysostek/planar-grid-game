@@ -16,6 +16,9 @@ export const useGameStore = create((set) => ({
   width:8,
   height:5,
 
+  // The currently loaded level
+  loadedLevel: null,
+
   // Setters for width and height also resize the grid.
   grid:[],
 
@@ -67,7 +70,20 @@ export const useGameStore = create((set) => ({
     return {
       dragging: null,
       grid: grid,
-      colors:{}
+      loadedLevel: null
+    }
+  }), 
+
+  // Here we will define global actions that users can perform
+  reloadLevel: ()  => set((state) => {
+
+    const grid = new Array(state.width * state.height);
+
+    // TODO code to regenerate the grid.
+
+    return {
+      dragging: null,
+      grid: grid
     }
   }), 
 
@@ -89,6 +105,12 @@ export const useGameStore = create((set) => ({
     grid[x + (y * state.width)].source = source;
 
     return {grid}
+  }), 
+
+  loadLevel: (level)  => set((state) => {
+    return {
+      loadedLevel: level,
+    }
   }), 
 
 }));  

@@ -10,9 +10,7 @@ import { useColorStore } from '../store/ColorStore';
 // Create a React Function component that takes in input props and renders some dom content.
 const Controls = (props) => {
 
-  const reset = useGameStore((state) => state.reset);
-  const populate = useGameStore((state) => state.populate);
-  const markCellAsSource = useGameStore((state) => state.markCellAsSource);
+  const reloadLevel = useGameStore((state) => state.reloadLevel);
 
   const red     = useColorStore((state) => state.red);
   const orange  = useColorStore((state) => state.orange);
@@ -27,13 +25,13 @@ const Controls = (props) => {
       <Button
         variant='outlined'
         onClick={() => {
-          reset();
+          reloadLevel();
         }}
       >
         Restart
       </Button>
 
-      <Button
+      {/* <Button
         variant='outlined'
         onClick={() => {
           for(let i = 0; i < Math.floor(Math.random() * 8) + 1; i++){
@@ -48,7 +46,7 @@ const Controls = (props) => {
         }}
       >
         Populate
-      </Button>
+      </Button> */}
     </div>
   );
 }
