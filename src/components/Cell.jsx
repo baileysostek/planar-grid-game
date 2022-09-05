@@ -73,6 +73,7 @@ const Cell = React.forwardRef((props, ref) => {
 
   // Internal State
   const [hover, setHover] = useState(false);
+  const [borderColor, setBorderColor] = useState('#000000');
 
   // Determine the cell size here
   const cellSize = (hover || !(color == DEFAULT_COLOR)) ? hoverSize : defaultSize;
@@ -177,11 +178,6 @@ const Cell = React.forwardRef((props, ref) => {
       // NOW current_max is a single element.
     }
 
-    // Now we check if we have found a parent, if we have we need to invalidate it and set ourself to a source tile
-    if(!!current_max){
-      setSource(current_max.x, current_max.y, false);
-    }
-
     return current_max;
   }
 
@@ -192,6 +188,7 @@ const Cell = React.forwardRef((props, ref) => {
     const parent = calculateCellParent(screenPos);
 
     if(parent){
+
       // If we are not dragging, set that we are dragging this color
       if(!!!dragging){
         setDragging(parent.color)
@@ -200,6 +197,11 @@ const Cell = React.forwardRef((props, ref) => {
       // Populate this cell with the color of its parent, and the value of its parent + 1
       populate(x, y, parent.color, parent.value + 1, parent);
       setSource(x, y, true);
+      // The parent now has a new child cell, so we need to say that the parent is no longer a source.
+      setSource(parent.x, parent.y, false);
+
+      // Make sure we set this cell's border color back to the default border color
+      setBorderColor('#000000');
     }
   }
 
@@ -255,13 +257,35 @@ const Cell = React.forwardRef((props, ref) => {
           onMouseOver={(event) => {
             if(!dragging){
               setHover(true);
+
+              // If we have not set this to a value yet, it has an ambigouous value, display what we are planning on setting this to have a value of.
+              let mostValidParent = calculateCellParent(calculateRelativeMouseCoords(event));
+              if(mostValidParent){
+                setBorderColor(mostValidParent.color)
+              }
+              console.log("here?");
+
             }else{
               populateCell();
             }
           }}
 
+          onMouseMove={(event) => {
+            if(!dragging){
+              setHover(true);
+
+              // If we have not set this to a value yet, it has an ambigouous value, display what we are planning on setting this to have a value of.
+              let mostValidParent = calculateCellParent(calculateRelativeMouseCoords(event));
+              if(mostValidParent){
+                setBorderColor(mostValidParent.color)
+              }
+              console.log("here?");
+            }
+          }}
+
           onMouseLeave={() => {
             setHover(false);
+            setBorderColor('#000000');
           }}
 
           onMouseDown={(event) => {
@@ -281,11 +305,11 @@ const Cell = React.forwardRef((props, ref) => {
             height: cellSize,
             width: cellSize,
             lineHeight: '60px',
-            transition: `width ${TRANSITION_SPEED}, height ${TRANSITION_SPEED}, background-color ${TRANSITION_SPEED}, transform ${TRANSITION_SPEED}, border-radius ${TRANSITION_SPEED}`,
+            transition: `width ${TRANSITION_SPEED}, height ${TRANSITION_SPEED}, background-color ${TRANSITION_SPEED}, color ${TRANSITION_SPEED}, transform ${TRANSITION_SPEED}, border-radius ${TRANSITION_SPEED}`,
             transform: 'translate(-50%, -50%)',
 
             backgroundColor: color,
-            color:'#000000',
+            color:borderColor,
 			      boxShadow: 'none',
 
             zIndex:1,
