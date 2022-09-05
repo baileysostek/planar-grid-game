@@ -19,6 +19,9 @@ export const useGameStore = create((set) => ({
   // The currently loaded level
   loadedLevel: null,
 
+  // This stores if the game state is in a win condition or not.
+  win:false,
+
   // Setters for width and height also resize the grid.
   grid:[],
 
@@ -48,7 +51,25 @@ export const useGameStore = create((set) => ({
 
     grid[x + (y * state.width)].parent = parent;
 
-    return {grid}
+    // Check for win here. 
+    let win = true
+    loop:for(let j = 0; j < state.height; j++){
+      for(let i = 0; i < state.width; i++){
+        // Make sure a grid has a value
+        if(!grid[i + (j * state.width)]){
+          win = false;
+          console.log(grid[i + (j * state.width)])
+          break loop;
+        }
+      }
+    }
+
+    console.log("Win?", win);
+
+    return {
+      grid:grid,
+      win:win,
+    }
   }), 
 
   // This function populates a cell with a color
@@ -77,7 +98,8 @@ export const useGameStore = create((set) => ({
     return {
       dragging: null,
       grid: grid,
-      loadedLevel: null
+      loadedLevel: null,
+      win:false,
     }
   }), 
 
@@ -129,6 +151,8 @@ export const useGameStore = create((set) => ({
 
     return {
       loadedLevel: level,
+      width: level.width,
+      height: level.height,
     }
   }), 
 

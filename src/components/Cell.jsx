@@ -133,18 +133,26 @@ const Cell = React.forwardRef((props, ref) => {
             }
           }
 
-          // This is the right color to populate this cell with.
-          if(current_max == null || (!!current_max && current_max.value < direction.value)){
+          // If this is first valid, set max and continue.
+          if(current_max == null){
             current_max = direction;
-          }else{
-            if((!!current_max && current_max.value == direction.value)){
-              // Turn current_max into an array
-              if(!Array.isArray(current_max)){
-                current_max = [current_max];
-              }
-              // Push onto array
-              current_max.push(direction);
+            continue;
+          }
+
+          // This is the right color to populate this cell with.
+          if(!!current_max && current_max.value < direction.value){
+            current_max = direction;
+            continue;
+          }
+
+          // If the cur max distance is === to 
+          if((!!current_max && ((current_max.value == direction.value) || ((current_max.color != direction.color) && (direction.color != DEFAULT_COLOR))))){
+            // Turn current_max into an array
+            if(!Array.isArray(current_max)){
+              current_max = [current_max];
             }
+            // Push onto array
+            current_max.push(direction);
           }
         }
       }
@@ -224,7 +232,6 @@ const Cell = React.forwardRef((props, ref) => {
       if(index == 4){
         x = screenX - parent.offsetLeft + (parent.offsetWidth / 2) - (8 + 8 + 24);
         y = screenY - parent.offsetTop + (parent.offsetHeight / 2) - (8 + 8 + 24);
-        console.log(x, y);
         break;
       }
 
@@ -236,6 +243,18 @@ const Cell = React.forwardRef((props, ref) => {
 
   }
 
+  // This function determines what the border color for a cell should be. It is referenced by mouse event functions within the cell render function.
+  const determineBorderColor = (event) => {
+    setHover(true);
+
+    // If we have not set this to a value yet, it has an ambigouous value, display what we are planning on setting this to have a value of.
+    let mostValidParent = calculateCellParent(calculateRelativeMouseCoords(event));
+    if(mostValidParent){
+      setBorderColor(mostValidParent.color);
+    }
+  }
+
+  // This is the render function for a cell. This function is called once per frame to determine the DOM representation of a cell.
   return (
 		<div
       ref={component}
@@ -256,15 +275,7 @@ const Cell = React.forwardRef((props, ref) => {
         <Paper 
           onMouseOver={(event) => {
             if(!dragging){
-              setHover(true);
-
-              // If we have not set this to a value yet, it has an ambigouous value, display what we are planning on setting this to have a value of.
-              let mostValidParent = calculateCellParent(calculateRelativeMouseCoords(event));
-              if(mostValidParent){
-                setBorderColor(mostValidParent.color)
-              }
-              console.log("here?");
-
+              determineBorderColor(event);
             }else{
               populateCell();
             }
@@ -272,14 +283,7 @@ const Cell = React.forwardRef((props, ref) => {
 
           onMouseMove={(event) => {
             if(!dragging){
-              setHover(true);
-
-              // If we have not set this to a value yet, it has an ambigouous value, display what we are planning on setting this to have a value of.
-              let mostValidParent = calculateCellParent(calculateRelativeMouseCoords(event));
-              if(mostValidParent){
-                setBorderColor(mostValidParent.color)
-              }
-              console.log("here?");
+              determineBorderColor(event);
             }
           }}
 
