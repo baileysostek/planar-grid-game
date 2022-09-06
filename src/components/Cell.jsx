@@ -114,7 +114,7 @@ const Cell = React.forwardRef((props, ref) => {
       return null; // This cell is already populated.
     }
 
-    let current_max = null;
+    let current_max = [];
 
     // For each direction
     for(let direction of directions){
@@ -122,6 +122,7 @@ const Cell = React.forwardRef((props, ref) => {
         // if the neighbor has a non-default color.
         if ( direction?.color != DEFAULT_COLOR) {
 
+          // If the direction is not a source tile we can skip it.
           if(!!!(direction?.source)){
             continue; // Not a source tile
           }
@@ -131,48 +132,44 @@ const Cell = React.forwardRef((props, ref) => {
             // If we are dragging a color different from this color, continue.
             if(direction.color != dragging){
               continue; // Not the right color.
+            }else{
+              // This is the correct color, check if this new value is larger.
+              let newCellBigger = true;
+              for(let cell of current_max){
+                if(cell){
+                  if(direction.value < cell.value){
+                    newCellBigger = false;
+                    break;
+                  }
+                }
+              }
+              if(newCellBigger){
+                current_max = [];
+                current_max.push(direction);
+              }
+              continue;
             }
           }
 
-          // If this is first valid, set max and continue.
-          if(current_max == null){
-            current_max = direction;
-            continue;
-          }
-
-          // This is the right color to populate this cell with.
-          if(!!current_max && current_max.value < direction.value){
-            current_max = direction;
-            continue;
-          }
-
-          // If the cur max distance is === to 
-          if((!!current_max && ((current_max.value == direction.value) || ((current_max.color != direction.color) && (direction.color != DEFAULT_COLOR))))){
-            // Turn current_max into an array
-            if(!Array.isArray(current_max)){
-              current_max = [current_max];
-            }
-            // Push onto array
-            current_max.push(direction);
-          }
+          // If we get to this point, this is a possible cell to evaluate.
+          current_max.push(direction);
         }
       }
     }
 
-    // Sometimes we have an array here, if we have an array we need to reduce the elements to a single array. 
     // Sort these elements by distance to see which we are closest to.
-    if(Array.isArray(current_max)){
 
+    if(current_max.length > 1){
       // Start with a really big number
       let closestDistance = Number.MAX_VALUE;
       let closestElement = null;
       for(let element of current_max){
         // Calculate distances for each element.
-        let elementX = (element.x * hoverSize) + hoverSize / 2;
-        let elementY = (element.y * hoverSize) + hoverSize / 2;
+        let elementX = (element.x * hoverSize) + hoverSize;
+        let elementY = (element.y * hoverSize) + hoverSize;
 
         // Now we do some maths.
-        // Credit here to our friend Pythagoras, this is code i wrote based off of his theorem 
+        // Credit here to our friend Pythagoras, this is code I wrote based off of his theorem 
         // Two point distance function, sqrt(x^2 + y^2)
         let distance = Math.sqrt((elementX - screenPos.x) * (elementX - screenPos.x) + (elementY - screenPos.y) * (elementY - screenPos.y));
 
@@ -182,12 +179,11 @@ const Cell = React.forwardRef((props, ref) => {
         }
       }
       
-      // Reduce cur_max to a single element. No longer an array
-      current_max = closestElement;
-      // NOW current_max is a single element.
+      // Return closest element
+      return closestElement;
+    }else{
+      return current_max[0];
     }
-
-    return current_max;
   }
 
   // This functionality handles a click/select event for a cell
@@ -251,7 +247,7 @@ const Cell = React.forwardRef((props, ref) => {
   const determineBorderColor = (event) => {
     setHover(true);
 
-    // If we have not set this to a value yet, it has an ambigouous value, display what we are planning on setting this to have a value of.
+    // If we have not set this to a value yet, it has an ambiguous value, display what we are planning on setting this to have a value of.
     let mostValidParent = calculateCellParent(calculateRelativeMouseCoords(event));
     if(mostValidParent){
       setBorderColor(mostValidParent.color);
@@ -281,7 +277,7 @@ const Cell = React.forwardRef((props, ref) => {
             if(!dragging){
               determineBorderColor(event);
             }else{
-              populateCell();
+              populateCell(calculateRelativeMouseCoords(event));
             }
           }}
 

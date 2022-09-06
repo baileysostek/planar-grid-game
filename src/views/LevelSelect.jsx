@@ -45,6 +45,26 @@ const LevelSelect = (props) => {
       blockers:[{x:0, y:0}]
     },
     {
+      name:"level 1",
+      width:7,
+      height:7,
+      sources:[
+        {x:0, y:6, color:'yellow'},
+        {x:1, y:6, color:'red'},
+        {x:2, y:6, color:'orange'},
+        {x:3, y:0, color:'yellow'},
+        {x:3, y:4, color:'green'},
+        {x:5, y:1, color:'cyan'},
+        {x:5, y:3, color:'green'},
+        {x:5, y:4, color:'cyan'},
+        {x:5, y:5, color:'orange'},
+        {x:6, y:3, color:'red'},
+        {x:6, y:4, color:'blue'},
+        {x:6, y:6, color:'blue'},
+      ],
+      blockers:[{x:0, y:0}]
+    },
+    {
       name:"level 2",
       width:4,
       height:2,
@@ -82,8 +102,7 @@ const LevelSelect = (props) => {
   // Get everything out of our global stores that we may need
   const theme = useThemeStore((state) => state.theme);
 
-  const populate = useGameStore((state) => state.populate);
-  const markCellAsSource = useGameStore((state) => state.markCellAsSource);
+  const win   = useGameStore((state) => state.win);
 
   const handleClose = () => {
     unloadLevel();
@@ -137,6 +156,7 @@ const LevelSelect = (props) => {
                 {/* If there is a level loaded, lets display that board */}
                 <Board level={loadedLevel}/>
                 <Controls/>
+                {win ? <div> Win!</div> : <></>}
               </div> : <></>}
             </Box>
           </Fade>
