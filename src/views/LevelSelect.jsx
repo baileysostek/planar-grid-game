@@ -14,6 +14,8 @@ import Backdrop from '@mui/material/Backdrop';
 import Box from '@mui/material/Box';
 import Fade from '@mui/material/Fade';
 
+import Confetti from 'react-confetti';
+
 // CSS
 const style = {
   position: 'absolute',
@@ -45,7 +47,45 @@ const LevelSelect = (props) => {
       blockers:[{x:0, y:0}]
     },
     {
-      name:"level 1",
+      name:"level 2",
+      width:3,
+      height:3,
+      sources:[
+        {x:0, y:0, color:'red'},
+        {x:1, y:2, color:'red'},
+        {x:1, y:1, color:'black'},
+        {x:1, y:0, color:'yellow'},
+        {x:2, y:2, color:'yellow'},
+      ],
+      blockers:[{x:0, y:0}]
+    },
+    {
+      name:"level 3",
+      width:4,
+      height:2,
+      sources:[
+        {x:0, y:0, color:'red'},
+        {x:2, y:0, color:'red'},
+        {x:3, y:0, color:'orange'},
+        {x:2, y:1, color:'orange'},
+      ]
+    },
+    {
+      name:"level 4",
+      width:8,
+      height:5,
+      sources:[],
+      blockers:[{x:0, y:0}]
+    },
+    {
+      name:"level 5",
+      width:8,
+      height:5,
+      sources:[],
+      blockers:[]
+    },
+    {
+      name:"Challenge",
       width:7,
       height:7,
       sources:[
@@ -62,33 +102,7 @@ const LevelSelect = (props) => {
         {x:6, y:4, color:'blue'},
         {x:6, y:6, color:'blue'},
       ],
-      blockers:[{x:0, y:0}]
-    },
-    {
-      name:"level 2",
-      width:4,
-      height:2,
-      sources:[
-        {x:0, y:0, color:'red'},
-        {x:2, y:0, color:'red'},
-        {x:3, y:0, color:'orange'},
-        {x:2, y:1, color:'orange'},
-      ],
-      blockers:[{x:0, y:0}]
-    },
-    {
-      name:"level 3",
-      width:8,
-      height:5,
-      sources:[],
-      blockers:[{x:0, y:0}]
-    },
-    {
-      name:"level 4",
-      width:8,
-      height:5,
-      sources:[],
-      blockers:[{x:0, y:0}]
+      blockers:[]
     },
   ]);     
 
@@ -141,24 +155,31 @@ const LevelSelect = (props) => {
           }}
         >
           <Fade in={!!loadedLevel}>
-            <Box sx={style}>
-              {!!loadedLevel ? <div 
-                style={{
-                  borderRadius: '24px',
-                  border:'8px solid',
-                  padding: '24px',
-                  color:'#000000',
-                  overflow:'hidden',
-                  width: 'auto',
+            <div>
+            {win ? 
+        <Confetti
+          // width={800}
+          // height={800}
+        /> : <></>
+      }
+              <Box sx={style}>
+                {!!loadedLevel ? <div 
+                  style={{
+                    borderRadius: '24px',
+                    border:'8px solid',
+                    padding: '24px',
+                    color:'#000000',
+                    overflow:'hidden',
                     width: 'auto',
-                }}
-              >
-                {/* If there is a level loaded, lets display that board */}
-                <Board level={loadedLevel}/>
-                <Controls/>
-                {win ? <div> Win!</div> : <></>}
-              </div> : <></>}
-            </Box>
+                      width: 'auto',
+                  }}
+                >
+                  {/* If there is a level loaded, lets display that board */}
+                  <Board level={loadedLevel}/>
+                  <Controls/>
+                </div> : <></>}
+              </Box>
+            </div>
           </Fade>
         </Modal>
       </div>
