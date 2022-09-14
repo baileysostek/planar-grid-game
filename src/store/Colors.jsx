@@ -8,8 +8,8 @@ module.exports = Colors = {
     red         : '#BC4B51',
     orange      : '#F4A259',
     yellow      : '#F4E285',
-    green       : '#5B8E7D',
-    blue        : '#8Cb369',
+    blue        : '#5B8E7D',
+    green       : '#8Cb369',
 
     DEFAULT_COLOR : "#282c34",
 }

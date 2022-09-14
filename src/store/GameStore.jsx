@@ -27,6 +27,18 @@ export const useGameStore = create((set) => ({
   // Setters for width and height also resize the grid.
   grid:[],
 
+  // This is a list of levels that we have completed. This is a map that maps Level name to the completeness state of that level
+  complete:new Set(), 
+  markLevelComplete: (level) => set((state) => { 
+    let completeLevels = state.complete;
+
+    completeLevels.add(level.name);
+
+    return {
+      complete:completeLevels
+    } 
+  }),
+
   // This function populates a cell with a color
   populate: (x, y, color, value, parent = null) => set((state) => {
     const grid = [...state.grid];
@@ -152,6 +164,11 @@ export const useGameStore = create((set) => ({
       }
     }
 
+    let curComplete = state.complete;
+    if(win){
+      state.markLevelComplete(state.loadedLevel);
+    }
+
     return{
       win:win
     }
@@ -236,6 +253,19 @@ export const useGameStore = create((set) => ({
 
       state.populate(x, y, color, 0);
       state.markCellAsSource(x, y);
+    }
+
+    for(let blocker of level?.blockers){
+      let x = blocker.x;
+      let y = blocker.y;
+
+
+      let color =  colors['blocker'];
+      if(color == undefined){
+        color = "#1F1F1F";
+      }
+
+      state.populate(x, y, color, 0);
     }
 
     return {

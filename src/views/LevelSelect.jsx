@@ -15,6 +15,7 @@ import Box from '@mui/material/Box';
 import Fade from '@mui/material/Fade';
 
 import Confetti from 'react-confetti';
+import LevelCell from '../components/LevelCell';
 
 // CSS
 const style = {
@@ -48,16 +49,17 @@ const LevelSelect = (props) => {
     },
     {
       name:"level 2",
-      width:3,
-      height:3,
+      width:8,
+      height:4,
       sources:[
-        {x:0, y:0, color:'red'},
-        {x:1, y:2, color:'red'},
-        {x:1, y:1, color:'black'},
-        {x:1, y:0, color:'yellow'},
-        {x:2, y:2, color:'yellow'},
+        {x:1, y:0, color:'red'},
+        {x:4, y:2, color:'red'},
+        {x:4, y:1, color:'yellow'},
+        {x:4, y:3, color:'yellow'},
+        {x:2, y:0, color:'blue'},
+        {x:5, y:0, color:'blue'},
       ],
-      blockers:[{x:0, y:0}]
+      blockers:[{x:1, y:1}]
     },
     {
       name:"level 3",
@@ -127,6 +129,7 @@ const LevelSelect = (props) => {
     reset();
   }
 
+
   return (
     <ThemeProvider theme={theme}>
       {
@@ -138,7 +141,7 @@ const LevelSelect = (props) => {
               }
             }}
           >
-            {JSON.stringify(level)}
+            <LevelCell level={level} />
           </div>
         ))
       }

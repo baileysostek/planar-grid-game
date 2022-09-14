@@ -318,6 +318,9 @@ const Cell = React.forwardRef((props, ref) => {
 
             zIndex:1,
 
+            // Change the cursor so that it looks like we can click this
+            cursor: (hover && !value) ? 'pointer' : 'default',
+
             // Control if a border is shown or not.
             borderTop     : shouldConnectToNeighbor(up) ? 0 : 8.5,
             borderBottom  : shouldConnectToNeighbor(down) ? 0 : 8.5,
