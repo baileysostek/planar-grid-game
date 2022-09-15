@@ -63,27 +63,16 @@ const LevelSelect = (props) => {
     },
     {
       name:"level 3",
-      width:4,
-      height:2,
+      width:8,
+      height:8,
       sources:[
-        {x:0, y:0, color:'red'},
-        {x:2, y:0, color:'red'},
-        {x:3, y:0, color:'orange'},
-        {x:2, y:1, color:'orange'},
-      ]
-    },
-    {
-      name:"level 4",
-      width:8,
-      height:5,
-      sources:[],
-      blockers:[{x:0, y:0}]
-    },
-    {
-      name:"level 5",
-      width:8,
-      height:5,
-      sources:[],
+        {x:7, y:0, color:'blue'},
+        {x:7, y:7, color:'blue'},
+        {x:4, y:2, color:'yellow'},
+        {x:7, y:6, color:'yellow'},
+        {x:0, y:7, color:'red'},
+        {x:4, y:4, color:'red'},
+      ],
       blockers:[]
     },
     {
