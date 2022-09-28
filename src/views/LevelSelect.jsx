@@ -46,7 +46,7 @@ const LevelSelect = (props) => {
         {x:0, y:0, color:'red'},
         {x:2, y:2, color:'red'},
       ],
-      blockers:[{x:0, y:0}]
+      blockers:[]
     },
     {
       name:"level 2",
