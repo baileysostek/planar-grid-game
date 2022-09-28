@@ -19,6 +19,7 @@ const Board = (props) => {
   return (
     // This is the Parent DIV which represents a Board, it contains rows of cells
     <div
+      data-testid={`board`}
       onMouseLeave={(event) => { 
         setDragging(false);
       }}

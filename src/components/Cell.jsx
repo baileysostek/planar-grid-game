@@ -36,6 +36,7 @@ const Cell = React.forwardRef((props, ref) => {
 
   // Extract information from the global state an put it into this cell.
   let cell = getCell(x, y);
+  
   let color = cell?.color;
   if(!color){
     color = DEFAULT_COLOR;
@@ -257,6 +258,7 @@ const Cell = React.forwardRef((props, ref) => {
   // This is the render function for a cell. This function is called once per frame to determine the DOM representation of a cell.
   return (
 		<div
+      data-testid={`cell-${x}-${y}`}
       ref={component}
       style={{
 				width:hoverSize,

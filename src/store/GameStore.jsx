@@ -291,3 +291,10 @@ function new_Cell(x, y) {
     value:0
   }
 }
+
+
+// import create from 'zustand'
+
+// import store from './Model';
+
+// export const useGameStore = create(store);

@@ -14,6 +14,7 @@ const Controls = (props) => {
   return (
     <div>
       <Button
+        data-testid={`restart`}
         variant='outlined'
         onClick={() => {
           reloadLevel();

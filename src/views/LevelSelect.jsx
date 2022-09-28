@@ -8,11 +8,12 @@ import { useThemeStore } from '../store/ThemeStore'
 import Board from '../components/Board';
 import Controls from '../components/Controls';
 
+// Material UI Imports
 import { Modal } from '@mui/material';
-
 import Backdrop from '@mui/material/Backdrop';
 import Box from '@mui/material/Box';
 import Fade from '@mui/material/Fade';
+import Button from '@mui/material/Button';
 
 import Confetti from 'react-confetti';
 import LevelCell from '../components/LevelCell';
@@ -121,19 +122,21 @@ const LevelSelect = (props) => {
 
   return (
     <ThemeProvider theme={theme}>
-      {
-        levels.map((level, index) => (
-          <div key={index}
-            onClick={() => {
-              if(!loadedLevel){
-                loadLevel(level);
-              }
-            }}
-          >
-            <LevelCell level={level} />
-          </div>
-        ))
-      }
+      <div data-testid="level-select">
+        {
+          levels.map((level, index) => (
+            <div key={index}
+              onClick={() => {
+                if(!loadedLevel){
+                  loadLevel(level);
+                }
+              }}
+            >
+              <LevelCell level={level} />
+            </div>
+          ))
+        }
+      </div>
       <div>
         <Modal
           aria-labelledby="transition-modal-title"
@@ -148,29 +151,39 @@ const LevelSelect = (props) => {
         >
           <Fade in={!!loadedLevel}>
             <div>
-            {win ? 
-        <Confetti
-          // width={800}
-          // height={800}
-        /> : <></>
-      }
-              <Box sx={style}>
-                {!!loadedLevel ? <div 
-                  style={{
-                    borderRadius: '24px',
-                    border:'8px solid',
-                    padding: '24px',
-                    color:'#000000',
-                    overflow:'hidden',
-                    width: 'auto',
+              {win ? 
+                <Confetti
+                  data-testid="win"
+                  // width={800}
+                  // height={800}
+                /> : <></>
+              }
+                <Box sx={style}>
+                  {!!loadedLevel ? <div 
+                    style={{
+                      borderRadius: '24px',
+                      border:'8px solid',
+                      padding: '24px',
+                      color:'#000000',
+                      overflow:'hidden',
                       width: 'auto',
-                  }}
-                >
-                  {/* If there is a level loaded, lets display that board */}
-                  <Board level={loadedLevel}/>
-                  <Controls/>
-                </div> : <></>}
-              </Box>
+                        width: 'auto',
+                    }}
+                  >
+                    {/* If there is a level loaded, lets display that board */}
+                    <Board level={loadedLevel}/>
+                    <Controls/>
+                    <Button
+                      data-testid="close-level"
+                      variant='outlined'
+                      onClick={() => {
+                        unloadLevel();
+                      }}
+                    >
+                      close
+                    </Button>
+                  </div> : <></>}
+                </Box>
             </div>
           </Fade>
         </Modal>
