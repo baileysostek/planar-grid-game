@@ -2,8 +2,9 @@ import React, { useState } from 'react';
 
 import { ThemeProvider } from '@mui/material/styles';
 
-import { useGameStore } from '../store/GameStore'
+import { useGameStore } from '../store/Model'
 import { useThemeStore } from '../store/ThemeStore'
+import { background } from '../store/Colors';
 
 import Board from '../components/Board';
 import Controls from '../components/Controls';
@@ -28,7 +29,7 @@ const style = {
   p: 4,
   padding:'0px',
   borderRadius:'24px',
-  backgroundColor:'#3A5A40'
+  backgroundColor:background
 };
 
 // Create a function to render our board.
@@ -118,11 +119,14 @@ const LevelSelect = (props) => {
     reset();
   }
 
+  // Draw calls / render functions
 
-  return (
-    <ThemeProvider theme={theme}>
-      {
-        levels.map((level, index) => (
+  const renderLevelSelect = () => {
+    return <div>
+        <div>
+          Level Select
+        </div>
+        {levels.map((level, index) => (
           <div key={index}
             onClick={() => {
               if(!loadedLevel){
@@ -132,8 +136,17 @@ const LevelSelect = (props) => {
           >
             <LevelCell level={level} />
           </div>
-        ))
-      }
+        ))}
+      </div>
+  }
+
+  // This is what the function component returns to the DOM when it is rendered in browser
+  return (
+    <ThemeProvider theme={theme}>
+      {/* Render all levels that we can play */}
+      {renderLevelSelect()}
+
+      {/* Have a div containing other levels to play */}
       <div>
         <Modal
           aria-labelledby="transition-modal-title"

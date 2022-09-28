@@ -1,6 +1,6 @@
 import create from 'zustand'
 
-import colors, { DEFAULT_COLOR } from '../store/Colors';
+import colors, { DEFAULT_COLOR } from './Colors';
 
 // This is a global store to hold our game data. These stores can be referenced within any child components by using the useStore Hook
 export const useGameStore = create((set) => ({
@@ -50,8 +50,20 @@ export const useGameStore = create((set) => ({
       }
     }
 
+    // Init the grid at this location.
     if(!grid[x + (y * state.width)]){
-      grid[x + (y * state.width)] = new_Cell(x, y);
+      grid[x + (y * state.width)] = {
+        source:false,
+    
+        x:x,
+        y:y,
+    
+        parent:null,
+        child:null,
+    
+        color:colors.DEFAULT_COLOR,
+        value:0
+      };
     }
 
 
@@ -274,20 +286,3 @@ export const useGameStore = create((set) => ({
   }), 
 
 }));  
-
-
-// This is the STRUCT or JSON definition for a cell, these are the cell props
-function new_Cell(x, y) {
-  return {
-    source:false,
-
-    x:x,
-    y:y,
-
-    parent:null,
-    child:null,
-
-    color:colors.DEFAULT_COLOR,
-    value:0
-  }
-}

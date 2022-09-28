@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import Button from '@mui/material/Button';
 
 // Store Imports
-import { useGameStore } from '../store/GameStore';
+import { useGameStore } from '../store/Model';
 
 // Create a React Function component that takes in input props and renders some dom content.
 const Controls = (props) => {

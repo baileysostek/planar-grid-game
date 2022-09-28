@@ -1,8 +1,13 @@
 import { render, screen } from '@testing-library/react';
 import App from './App';
+import LevelSelect from './views/LevelSelect';
 
-test('renders learn react link', () => {
-  render(<App />);
-  const linkElement = screen.getByText(/learn react/i);
-  expect(linkElement).toBeInTheDocument();
+// Test that the level select page loads by default
+test('renders the level select page', async () => {
+  const { container } = render(<App />);
+  
+  await waitFor(() => {
+    expect(container).toBeInTheDocument();
+    done();
+  });
 });

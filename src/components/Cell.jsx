@@ -5,7 +5,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import Paper from '@mui/material/Paper';
 
 // Store Variables
-import { useGameStore } from '../store/GameStore';
+import { useGameStore } from '../store/Model';
 import { DEFAULT_COLOR } from '../store/Colors';
 import { Typography } from '@mui/material';
 import Box from '@mui/material/Box';
@@ -165,8 +165,9 @@ const Cell = React.forwardRef((props, ref) => {
       let closestElement = null;
       for(let element of current_max){
         // Calculate distances for each element.
-        let elementX = (element.x * hoverSize) + hoverSize;
-        let elementY = (element.y * hoverSize) + hoverSize;
+        // Get the screen pos for this element
+        let elementX = (element.x * hoverSize) + (hoverSize / 2);
+        let elementY = (element.y * hoverSize) + (hoverSize / 2);
 
         // Now we do some maths.
         // Credit here to our friend Pythagoras, this is code I wrote based off of his theorem 
@@ -216,40 +217,24 @@ const Cell = React.forwardRef((props, ref) => {
   // This function gets us the relative world coordinates from a mouse event. This will let us detect which cell we are closest to.
   const calculateRelativeMouseCoords = (event)=> {
 
-    // This is the start position, we want relative position so we need to do some recursive backtracking.
-    let screenX = event.pageX;
-    let screenY = event.pageY;
+    // Get the relative position of where the mouse is in this cell
+    let relativeX = event.nativeEvent.offsetX;
+    let relativeY = event.nativeEvent.offsetY;
 
-    let x = 0;
-    let y = 0;
+    // Now we offset this position by this cells index in the grid * the size of a cell + (size / 2)
+    relativeX += (x * hoverSize)
+    relativeY += (y * hoverSize)
 
-    let parent = component.current;
-    let index = 0;
-    while(parent){
-
-      // TODO maybe do a better way of getting the root element.
-      // ALSO 8 = border + 8 = border + 24 = margin === 40 offset from root.
-      if(index == 4){
-        x = screenX - parent.offsetLeft + (parent.offsetWidth / 2) - (8 + 8 + 24);
-        y = screenY - parent.offsetTop + (parent.offsetHeight / 2) - (8 + 8 + 24);
-        break;
-      }
-
-      parent = parent.parentElement;
-      index++;
-    }
-
-    return {x:x, y:y}
+    return {x:relativeX, y:relativeY}
 
   }
 
   // This function determines what the border color for a cell should be. It is referenced by mouse event functions within the cell render function.
   const determineBorderColor = (event) => {
-    setHover(true);
-
     // If we have not set this to a value yet, it has an ambiguous value, display what we are planning on setting this to have a value of.
     let mostValidParent = calculateCellParent(calculateRelativeMouseCoords(event));
     if(mostValidParent){
+      setHover(true);
       setBorderColor(mostValidParent.color);
     }
   }

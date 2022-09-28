@@ -1,7 +1,7 @@
 
 import React, { useRef, useEffect, useState } from 'react';
 
-import { useGameStore } from '../store/GameStore'
+import { useGameStore } from '../store/Model'
 
 import Box from '@mui/material/Box';
 

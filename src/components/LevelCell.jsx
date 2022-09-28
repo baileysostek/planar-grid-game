@@ -5,7 +5,7 @@ import { Typography } from '@mui/material';
 import Box from '@mui/material/Box';
 
 // Global Store
-import { useGameStore } from '../store/GameStore';
+import { useGameStore } from '../store/Model';
 
 // Icons
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'

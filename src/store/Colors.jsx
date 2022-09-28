@@ -1,4 +1,4 @@
-module.exports = Colors = {
+module.exports = {
     text        : '#FFFCF2',
     background  : '#282c34',
     primary     : '#403D39',
