@@ -1,6 +1,6 @@
 import create from 'zustand'
 
-import colors, { DEFAULT_COLOR } from '../store/Colors';
+import colors, { DEFAULT_COLOR, BLACK } from '../store/Colors';
 
 // This is a global store to hold our game data. These stores can be referenced within any child components by using the useStore Hook
 export const useGameStore = create((set) => ({
@@ -262,7 +262,7 @@ export const useGameStore = create((set) => ({
 
       let color =  colors['blocker'];
       if(color == undefined){
-        color = "#1F1F1F";
+        color = BLACK;
       }
 
       state.populate(x, y, color, 0);

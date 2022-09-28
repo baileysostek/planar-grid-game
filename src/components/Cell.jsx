@@ -6,7 +6,7 @@ import Paper from '@mui/material/Paper';
 
 // Store Variables
 import { useGameStore } from '../store/GameStore';
-import { DEFAULT_COLOR } from '../store/Colors';
+import { DEFAULT_COLOR, BLACK } from '../store/Colors';
 import { Typography } from '@mui/material';
 import Box from '@mui/material/Box';
 
@@ -218,9 +218,20 @@ const Cell = React.forwardRef((props, ref) => {
   // This function gets us the relative world coordinates from a mouse event. This will let us detect which cell we are closest to.
   const calculateRelativeMouseCoords = (event)=> {
 
+    // This may be null if this button was clicked through Jest
+    let mouseEvent = event;
+
+    // If from jest
+    if(!mouseEvent){
+      mouseEvent = {"nativeEvent":{
+        "offsetX":0,
+        "offsetY":0
+      }}
+    }
+
     // Get the relative position of where the mouse is in this cell
-    let relativeX = event.nativeEvent.offsetX;
-    let relativeY = event.nativeEvent.offsetY;
+    let relativeX = mouseEvent.nativeEvent.offsetX;
+    let relativeY = mouseEvent.nativeEvent.offsetY;
 
     // Now we offset this position by this cells index in the grid * the size of a cell + (size / 2)
     relativeX += (x * hoverSize)
@@ -239,6 +250,20 @@ const Cell = React.forwardRef((props, ref) => {
       setBorderColor(mostValidParent.color);
     }
   }
+
+  // Here are functions which our mouse listeners call
+  const onOver = (event) => {
+    if(!dragging){
+      determineBorderColor(event);
+    }else{
+      populateCell(calculateRelativeMouseCoords(event));
+    }
+  }
+
+  const onDown = (event) => {
+    populateCell(calculateRelativeMouseCoords(event));
+  }
+
 
   // This is the render function for a cell. This function is called once per frame to determine the DOM representation of a cell.
   return (
@@ -261,11 +286,7 @@ const Cell = React.forwardRef((props, ref) => {
       >
         <Paper 
           onMouseOver={(event) => {
-            if(!dragging){
-              determineBorderColor(event);
-            }else{
-              populateCell(calculateRelativeMouseCoords(event));
-            }
+            onOver(event);
           }}
 
           onMouseMove={(event) => {
@@ -280,10 +301,8 @@ const Cell = React.forwardRef((props, ref) => {
           }}
 
           onMouseDown={(event) => {
-            // Here we need to do some math to see what cell we are closest to.
-
             event.preventDefault();
-            populateCell(calculateRelativeMouseCoords(event));
+            onDown(event);
           }}
 
           onMouseUp={(event) => {
@@ -329,8 +348,22 @@ const Cell = React.forwardRef((props, ref) => {
             //Control the Drop shadow around each of our cells
           }}
         >
-          {/* Debug the values in the cell */}
+          {/* Render the cell's values */}
           {value > 0 ? 
+            <Box sx={{
+              height: `${hoverSize}px`,
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "center"
+            }}>
+              <Typography align='center' alignContent={'center'} variant='h3'>
+                {value}
+              </Typography> 
+            </Box>
+          : <div/> }
+
+          {/* Render a Zero on all starting tiles except for blocker tiles */}
+          {value == 0 && (color != DEFAULT_COLOR) && (color != BLACK) ? 
             <Box sx={{
               height: `${hoverSize}px`,
               display: "flex",
@@ -377,6 +410,45 @@ const Cell = React.forwardRef((props, ref) => {
           
         </Paper>
         
+        <div>
+          {/* Here we render a fragment that contains clickable divs that allow us to test our mouse event functions*/}
+          <div
+            style={{width:'0px', height:'0px'}}
+            data-testid={`cell-${x}-${y}-over`}
+            onClick={() => {
+              onOver(null); // Spoof mouse event.
+            }}
+          />
+          <div
+            style={{width:'0px', height:'0px'}}
+            data-testid={`cell-${x}-${y}-move`}
+            onClick={() => {
+
+            }}
+          />
+          <div
+            style={{width:'0px', height:'0px'}}
+            data-testid={`cell-${x}-${y}-leave`}
+            onClick={() => {
+
+            }}
+          />
+          <div
+            style={{width:'0px', height:'0px'}}
+            data-testid={`cell-${x}-${y}-down`}
+            onClick={() => {
+              onDown(null); // Spoof mouse event.
+            }}
+          />
+          <div
+            style={{width:'0px', height:'0px'}}
+            data-testid={`cell-${x}-${y}-up`}
+            onClick={() => {
+
+            }}
+          />
+        </div>
+
       </div>
 		</div>
   );

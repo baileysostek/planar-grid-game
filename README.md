@@ -1,6 +1,10 @@
+Bailey Sostek Individual Project
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+
+FIRST make sure to run `npm install` to get all dependencies for this project, if this does not work please reach out to me at bhsostek@wpi.edu and I can walk you through the installation process.
 
 ## Available Scripts
 
@@ -14,57 +18,43 @@ Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
 The page will reload when you make changes.\
 You may also see any lint errors in the console.
 
-### `npm test`
+When the webpage loads you will see four levels that you can play. Click on a leve to start playing it. 
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+to select a square, hover a cell. The cell will expand and change its border color to indicate that it is selected and can be intereacted with. If there are multiple squares that could extend onto the selected tile, the border will change color to reflect which tile will be selected. The selection method dose a distance test between the currently hovered pixel of the selected tile and its neighboring tiles. It will chose the closest valid tile to extend. 
 
-### `npm run build`
+I also implemented dragging, Simply click and drag from one tile to the next. As long as the tile the mouse moves onto is a valid connection point, the chain of colored tiles will continue. 
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+If you make a mistake there is a restart level button in the bottom center of the board, additionally there is a return to home screen button that will take you back to the level select page. 
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+Once a level has been solved, confetti will fall from the top of the webpage, I found this component here: 
+https://www.npmjs.com/package/react-confetti
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+### `npm test -- --coverage --watchAll=false`
 
-### `npm run eject`
+This command runs all test cases with coverage. You can inspect the output of this command by looking at the generated webpage located at: /coverage/lcov-report/index.html
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
-
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
-
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+Here is the output when I run it on my end:
+NOTE i asked the professor if i could include an ignore for the index.js file and reportWebVitals.js file as there is no way to test them in jest, he said this was fine but not to spread the information around.
+------------------|---------|----------|---------|---------|-------------------------------
+File              | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s                                   
+------------------|---------|----------|---------|---------|-------------------------------
+All files         |   88.96 |    87.31 |   86.25 |   87.98 | 
+ src              |     100 |      100 |     100 |     100 | 
+  App.js          |     100 |      100 |     100 |     100 | 
+ src/components   |   84.41 |    89.85 |   71.42 |   83.44 | 
+  Board.jsx       |   88.88 |      100 |      80 |    87.5 | 24
+  Cell.jsx        |   83.45 |    90.29 |      64 |   82.67 | 88,135,165-185,279-310       
+  Controls.jsx    |     100 |      100 |     100 |     100 | 
+  LevelCell.jsx   |   85.71 |       75 |     100 |   83.33 | 22
+ src/store        |   93.33 |    81.96 |     100 |   92.85 |                               
+  Colors.jsx      |     100 |      100 |     100 |     100 | 
+  GameStore.jsx   |   93.04 |    81.96 |     100 |   92.59 | 97-98,101-102,119-120,148,169
+  ThemeStore.jsx  |     100 |      100 |     100 |     100 | 
+ src/views        |   93.93 |    83.33 |   94.11 |      92 | 
+  LevelSelect.jsx |   93.93 |    83.33 |   94.11 |      92 | 119-120
+------------------|---------|----------|---------|---------|-------------------------------
+Test Suites: 1 passed, 1 total
+Tests:       8 passed, 8 total
+Snapshots:   0 total
+Time:        7.146 s
+Ran all test suites.

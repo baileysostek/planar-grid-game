@@ -105,6 +105,11 @@ const LevelSelect = (props) => {
 
   const reset   = useGameStore((state) => state.reset);
 
+  // Hook calls used for testing
+  const winCheck          = useGameStore((state) => state.winCheck);
+  const setSource         = useGameStore((state) => state.setSource);
+  const markLevelComplete = useGameStore((state) => state.markLevelComplete);
+
   // Get everything out of our global stores that we may need
   const theme = useThemeStore((state) => state.theme);
 
@@ -188,6 +193,31 @@ const LevelSelect = (props) => {
           </Fade>
         </Modal>
       </div>
+      {/* Here we render a fragment that contains clickable divs that allow us to test our Zustand Store */}
+      <div
+        style={{width:'0px', height:'0px'}}
+        data-testid="check-win"
+        onClick={() => {
+          winCheck();
+        }}
+      />
+      <div
+        style={{width:'0px', height:'0px'}}
+        data-testid="check-set-source"
+        onClick={() => {
+          // Strictly used for testing hooks.
+          setSource(0, 0, true);
+          setSource(0, 0, false);
+        }}
+      />
+      <div
+        style={{width:'0px', height:'0px'}}
+        data-testid="mark-level-complete"
+        onClick={() => {
+          // Strictly used for testing hooks.
+          markLevelComplete(loadedLevel);
+        }}
+      />
     </ThemeProvider>
   );
 }
