@@ -4,6 +4,7 @@ import { ThemeProvider } from '@mui/material/styles';
 
 import { useGameStore } from '../store/GameStore'
 import { useThemeStore } from '../store/ThemeStore'
+import { background } from '../store/Colors'
 
 import Board from '../components/Board';
 import Controls from '../components/Controls';
@@ -29,7 +30,7 @@ const style = {
   p: 4,
   padding:'0px',
   borderRadius:'24px',
-  backgroundColor:'#3A5A40'
+  backgroundColor:background
 };
 
 // Create a function to render our board.
@@ -116,14 +117,8 @@ const LevelSelect = (props) => {
   const win   = useGameStore((state) => state.win);
 
   const handleClose = () => {
-    unloadLevel();
-    console.log("unloadLevel");
-  }
-
-  const unloadLevel = () => {
     reset();
   }
-
 
   return (
     <ThemeProvider theme={theme}>
@@ -178,15 +173,6 @@ const LevelSelect = (props) => {
                     {/* If there is a level loaded, lets display that board */}
                     <Board level={loadedLevel}/>
                     <Controls/>
-                    <Button
-                      data-testid="close-level"
-                      variant='outlined'
-                      onClick={() => {
-                        unloadLevel();
-                      }}
-                    >
-                      close
-                    </Button>
                   </div> : <></>}
                 </Box>
             </div>
