@@ -4,7 +4,7 @@ Bailey Sostek Individual Project
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
-FIRST make sure to run `npm install` to get all dependencies for this project, if this does not work please reach out to me at bhsostek@wpi.edu and I can walk you through the installation process.
+FIRST make sure to run `npm install` to get all dependencies for this project
 
 ## Available Scripts
 
